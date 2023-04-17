@@ -10,3 +10,8 @@ mysqlclient = "*"
 django-seed = "*"
 
 [dev-packages]
+
+[scripts]
+mm = "python manage.py makemigrations"
+mi = "python manage.py migrate"
+rs = "python manage.py runserver"
