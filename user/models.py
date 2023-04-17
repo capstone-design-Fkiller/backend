@@ -19,7 +19,7 @@ class User(models.Model):
         return self.name
 
 
-# 선순위----------------------------------------------------------------------------------------------------------------------------
+# # 선순위----------------------------------------------------------------------------------------------------------------------------
 
 # class Major(models.Model): # 관리자들이 설정하는 학과 정보
 #     id = models.BigAutoField(primary_key=True)
@@ -62,7 +62,7 @@ class User(models.Model):
 #     # priority_2 = models.ForeignKey(Priority2, on_delete=models.CASCADE, related_name='apply_2', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
 #     # priority_3 = models.ForeignKey(Priority3, on_delete=models.CASCADE, related_name='apply_3', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
 
-# major 도 있어야 할 거 같다
+# # major 도 있어야 할 거 같다.
 # class Building(models.Model):
 #     id = models.BigAutoField(primary_key=True)
 #     name = models.CharField(max_length=20)
@@ -90,6 +90,8 @@ class User(models.Model):
 
 #     def __str__(self):
 #         return self.name
+
+
 # # 게시글 나중에
 # class Article(models.Model):
 #     id = models.BigAutoField(primary_key=True)
