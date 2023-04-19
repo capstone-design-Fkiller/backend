@@ -7,7 +7,8 @@ class User(models.Model):
     id = models.BigAutoField(primary_key=True) # 이게 default라고 한다.
     name = models.CharField(max_length=20)
     password = models.CharField(max_length=20)
-    major = models.IntegerField(default=0) # foreign key로 변경할 예정. # major = models.ForeignKey(Major)
+    # major = models.IntegerField(default=0) # foreign key로 변경할 예정. # major = models.ForeignKey(Major)
+    major = models.ForeignKey("major.Major", related_name="major", on_delete=models.PROTECT, db_column="major")
     penalty = models.BooleanField(default=False)
     penalty_start_date = models.DateTimeField(null=True, blank=True) # start end 구분
     penalty_end_date = models.DateTimeField(null=True, blank=True)
