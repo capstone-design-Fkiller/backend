@@ -15,8 +15,8 @@ class User(models.Model):
     is_valid = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # class Meta:
-        # db_table = 'user'
+    class Meta:
+        db_table = 'user'
 
     def __str__(self):
         return self.name

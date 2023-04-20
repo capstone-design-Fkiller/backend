@@ -11,6 +11,9 @@ class Major(models.Model): # 관리자들이 설정하는 학과 정보
     priority_second = models.CharField(max_length=100, null=True, blank=True) # 학과 우선순위 기준 2
     priority_third = models.CharField(max_length=100, null=True, blank=True) # 학과 우선순위 기준 3
 
+    class Meta:
+        db_table = 'major'
+
     def __str__(self):
         return self.name # 학과 출력
     
