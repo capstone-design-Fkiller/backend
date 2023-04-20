@@ -1,13 +1,14 @@
 from django.db import models
 
-# Create your models here.
+from major.models import Major
 
+# Create your models here.
 
 class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=20)
     password = models.TextField() # front에서 암호화해서 보내줄 것으로 예상
-    major = models.ForeignKey("major.Major", related_name="user", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
+    major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
     penalty = models.BooleanField(default=False)
     penalty_start_date = models.DateTimeField(null=True, blank=True)
     penalty_end_date = models.DateTimeField(null=True, blank=True)
@@ -39,9 +40,9 @@ class User(models.Model):
 # # 조인테이블이어야 되는 것이 아닌가? 얘는 
 # class Priority1(models.Model): #애는 하나의 유저당 하나씩 만들어져야 한다. 손명근한테 우리 학과 질문, 그에 대한 답변 , 123필요 없다. 한 개만 있으면 된다. first_criteria, first_answer
 #     id = models.BigAutoField(primary_key=True)
-#     question = models.ForeignKey(Major) #Major의 pk, 즉 id를 가져온다.
-#     answer = models.ForeignKey(Apply) #Major의 pk, 즉 id를 가져온다.
-#     answer = models.CharField(max_length=100) #apply의 자식으로 답을 받아 오도록
+#     question = models.ForeignKey(Major, related_name="priority1", on_delete=models.PROTECT, db_column="question") #Major의 pk, 즉 id를 가져온다.
+#     answer = models.ForeignKey(Apply, related_name="priority1", on_delete=models.PROTECT, db_column="answer") #Major의 pk, 즉 id를 가져온다.
+#     # answer = models.CharField(max_length=100) #apply의 자식으로 답을 받아 오도록
 #     # question = models.CharField(max_length=100, unique=True) #major의 자식으로 해서 first질문 받아 오도록
 
 # class Priority2(models.Model):
@@ -56,14 +57,14 @@ class User(models.Model):
 
 # class Apply(models.Model): #학생이 신청할 때 폼이다.
 #     id = models.BigAutoField(primary_key=True)
-#     major = models.ForeignKey(Major) #Major의 pk, 즉 id를 가져온다.
-#     user = models.ForeignKey(User, on_delete=models.CASCADE) # 이름
+#     major = models.ForeignKey(Major, related_name="apply", on_delete=models.PROTECT, db_column="major") #Major의 pk, 즉 id를 가져온다.
+#     user = models.ForeignKey(User, related_name="apply", on_delete=models.PROTECT, db_column="user") # 이름
 #     priority_1_answer = models.CharField(max_length=100)
 #     priority_2_answer = models.CharField(max_length=100)
 #     priority_3_answer = models.CharField(max_length=100)
-#     # priority_1 = models.ForeignKey(Priority1, on_delete=models.CASCADE, related_name='apply_1', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
-#     # priority_2 = models.ForeignKey(Priority2, on_delete=models.CASCADE, related_name='apply_2', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
-#     # priority_3 = models.ForeignKey(Priority3, on_delete=models.CASCADE, related_name='apply_3', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
+#     # priority_1 = models.ForeignKey(Priority1, on_delete=models.PROTECT, related_name='apply_1', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
+#     # priority_2 = models.ForeignKey(Priority2, on_delete=models.PROTECT, related_name='apply_2', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
+#     # priority_3 = models.ForeignKey(Priority3, on_delete=models.PROTECT, related_name='apply_3', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
 
 # # major 도 있어야 할 거 같다.
 # class Building(models.Model):
@@ -73,9 +74,9 @@ class User(models.Model):
 # class Locker(models.Model): # 얘 만들려면 major db가 먼저 있어야 한다.
 #     id = models.BigAutoField(primary_key=True)
 #     building_id = models.IntegerField() # 빌딩은 int로 잘 되었고,
-#     major = models.ForeignKey(Major) # 맞는지 모르겠다.
-#     owned_id = models.ForeignKey(User, related_name='owned_lockers', null=True, blank=True) # 이건 맞고 
-#     shared_id = models.ForeignKey(User, related_name='shared_lockers', null=True, blank=True) # 이것도 맞다.
+#     major = models.ForeignKey(Major, related_name="locker", on_delete=models.PROTECT, db_column="major") # 맞는지 모르겠다.
+#     owned_id = models.ForeignKey(User, related_name='owned_locker', on_delete=models.PROTECT, db_column="owned_id", null=True, blank=True) # 이건 맞고 
+#     shared_id = models.ForeignKey(User, related_name='shared_locker', on_delete=models.PROTECT, db_column="shared_id", null=True, blank=True) # 이것도 맞다.
 #     is_share_registered = models.BooleanField(default=False) # 쉐어를 하겠다고 등록한 경우
 #     start_date = models.DateTimeField(null=True, blank=True) # 대여 시작 날짜, 대여라는 이름을 붙여야겠다. 이름 헷갈린다.
 #     end_date = models.DateTimeField(null=True, blank=True) # 대여 종료 날짜, 대여라는 이름을 붙여야겠다. 이름 헷갈린다.
@@ -89,7 +90,7 @@ class User(models.Model):
 #     id = models.BigAutoField(primary_key=True)
 #     name = models.CharField(max_length=100)
 #     password = models.CharField(max_length=100)
-#     major = models.ForeignKey(Major)
+#     major = models.ForeignKey(Major, related_name="admin", on_delete=models.PROTECT, db_column="major")
 
 #     def __str__(self):
 #         return self.name
@@ -98,11 +99,11 @@ class User(models.Model):
 # # 게시글 나중에
 # class Article(models.Model):
 #     id = models.BigAutoField(primary_key=True)
-#     writer_id = models.ForeignKey(User, on_delete=models.CASCADE)
+#     writer_id = models.ForeignKey(User, related_name="article", on_delete=models.PROTECT, db_column="writer_id")
 #     title = models.CharField(max_length=100)
 #     content = models.TextField()
 #     created_at = models.DateTimeField(auto_now_add=True)
-#     major = models.ForeignKey(Major)
+#     major = models.ForeignKey(Major, related_name="article", on_delete=models.PROTECT, db_column="major")
 
 #     def __str__(self):
 #         return self.title
@@ -110,7 +111,7 @@ class User(models.Model):
 # # 메시지 나중에
 # class Message(models.Model):
 #     id = models.BigAutoField(primary_key=True)
-#     writer_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-#     receiver_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+#     writer_id = models.ForeignKey(User, related_name="user", on_delete=models.PROTECT, related_name='sent_messages', db_column="writer_id")
+#     receiver_id = models.ForeignKey(User, related_name="user", on_delete=models.PROTECT, related_name='received_messages', db_column="receiver_id")
 #     content = models.TextField()
 #     created_at = models.DateTimeField(auto_now_add=True)

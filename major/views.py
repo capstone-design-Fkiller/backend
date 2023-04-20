@@ -5,7 +5,6 @@ from django.http import Http404
 
 from major.models import Major
 from major.serializers import MajorSerializer
-from user.serializers import UserSerializer
 
 class MajorAPIView(APIView):
     def get(self, request):
