@@ -5,7 +5,6 @@ from django.http import Http404
 
 from user.models import User
 from user.serializers import UserSerializer, UserMajorSerializer
-from django.core import serializers
 
 class UserAPIView(APIView):
     def get(self, request):
@@ -51,7 +50,7 @@ class UserDetail(APIView):
     
 class UserMajor(APIView):
     def get_queryset(self):
-        return User.objects.filter(major__id="2")
+        return User.objects.filter(major__id="1")
     
     # UserMajor 조회하기
     def get(self, request, format=None):

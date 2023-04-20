@@ -7,7 +7,7 @@ class MajorSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class NameMajorSerializer(serializers.ModelSerializer):
+class MajorNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = Major
         fields = ('name',)

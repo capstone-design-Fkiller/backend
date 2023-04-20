@@ -4,17 +4,19 @@ from django.db import models
 
 
 class User(models.Model):
-    id = models.BigAutoField(primary_key=True) # 이게 default라고 한다.
+    id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=20)
-    password = models.CharField(max_length=20)
-    # major = models.IntegerField(default=0) # foreign key로 변경할 예정. # major = models.ForeignKey(Major)
-    major = models.ForeignKey("major.Major", related_name="major", on_delete=models.PROTECT, db_column="major")
+    password = models.TextField() # front에서 암호화해서 보내줄 것으로 예상
+    major = models.ForeignKey("major.Major", related_name="user", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
     penalty = models.BooleanField(default=False)
-    penalty_start_date = models.DateTimeField(null=True, blank=True) # start end 구분
+    penalty_start_date = models.DateTimeField(null=True, blank=True)
     penalty_end_date = models.DateTimeField(null=True, blank=True)
-    id_card_img = models.TextField(default='') #길이 제한을 없애기 위해 text로 교체
+    id_card_img = models.TextField(default='')
     is_valid = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    # class Meta:
+        # db_table = 'user'
 
     def __str__(self):
         return self.name
@@ -45,7 +47,7 @@ class User(models.Model):
 # class Priority2(models.Model):
 #     id = models.BigAutoField(primary_key=True)
 #     question = models.CharField(max_length=100, unique=True, null=True, blank=True)
-#     answer = models.CharField(max_length=100, null=True, blank=True)
+#     answer = models.CharField(max_length=100, null=True, blank=True) # 1대 다로 만들어서 가져올 수 있도록.
 
 # class Priority3(models.Model):
 #     id = models.BigAutoField(primary_key=True)
