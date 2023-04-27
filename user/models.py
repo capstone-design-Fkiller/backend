@@ -12,7 +12,7 @@ class User(models.Model):
     penalty = models.BooleanField(default=False)
     penalty_start_date = models.DateTimeField(null=True, blank=True)
     penalty_end_date = models.DateTimeField(null=True, blank=True)
-    id_card_img = models.TextField(default='')
+    id_card_img = models.TextField(default='') # 길이 제한을 없애기 위해 text로 교체
     is_valid = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 

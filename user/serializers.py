@@ -1,6 +1,9 @@
 from major.serializers import MajorSerializer, MajorNameSerializer
 from .models import User
 from rest_framework import serializers
+from .models import User
+from major.models import Major
+
 
 class UserSerializer(serializers.ModelSerializer):
     # major = serializers.CharField(source='major.name')  # major 필드에 user.major.name 값을 serialize -> {major = "ELLT"} 로 출력
