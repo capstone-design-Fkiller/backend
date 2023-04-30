@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from django.http import Http404
 
 from user.models import User
-from user.serializers import UserSerializer, UserMajorSerializer
+from user.serializers import UserPostSerializer, UserSerializer, UserMajorSerializer
 
 class UserAPIView(APIView):
     def get(self, request):
@@ -14,7 +14,8 @@ class UserAPIView(APIView):
         return Response(serializer.data)
     
     def post(self, request):
-        serializer = UserSerializer(data = request.data)
+        serializer = UserPostSerializer(data = request.data)
+        # serializer = UserSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

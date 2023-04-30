@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "user",
     "major",
+    "locker",
     "rest_framework",
     "django_seed",
 ]
