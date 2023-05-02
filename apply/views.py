@@ -3,47 +3,47 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 
-from locker.models import Locker
-from locker.serializers import LockerSerializer
+from apply.models import Apply
+from apply.serializers import ApplySerializer
 
-class LockerAPIView(APIView):
+class ApplyAPIView(APIView):
     def get(self, request):
-        lockers = Locker.objects.all()
+        applys = Apply.objects.all()
 
-        serializer = LockerSerializer(lockers, many=True)
+        serializer = ApplySerializer(applys, many=True)
         return Response(serializer.data)
     
     def post(self, request):
-        serializer = LockerSerializer(data = request.data)
+        serializer = ApplySerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class LockerDetail(APIView):
+class ApplyDetail(APIView):
     def get_object(self, pk):
         try:
-            return Locker.objects.get(pk=pk)
-        except Locker.DoesNotExist:
+            return Apply.objects.get(pk=pk)
+        except Apply.DoesNotExist:
             raise Http404
     
-    # Locker의 detail 보기
+    # Apply의 detail 보기
     def get(self, request, pk, format=None):
-        locker = self.get_object(pk)
-        serializer = LockerSerializer(locker)
+        apply = self.get_object(pk)
+        serializer = ApplySerializer(apply)
         return Response(serializer.data)
 
-    # Locker 수정하기
+    # Apply 수정하기
     def put(self, request, pk, format=None):
-        locker = self.get_object(pk)
-        serializer = LockerSerializer(locker, data=request.data) 
+        apply = self.get_object(pk)
+        serializer = ApplySerializer(apply, data=request.data) 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Locker 삭제하기
+    # Apply 삭제하기
     def delete(self, request, pk, format=None):
-        locker = self.get_object(pk)
-        locker.delete()
+        apply = self.get_object(pk)
+        apply.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

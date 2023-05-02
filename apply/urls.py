@@ -1,10 +1,10 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
-from locker import views
+from apply import views
 
 urlpatterns = [
-    path('locker/', views.LockerAPIView.as_view()),
-    path('locker/<int:pk>', views.LockerDetail.as_view()),
+    path('apply/', views.ApplyAPIView.as_view()),
+    path('apply/<int:pk>', views.ApplyDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
