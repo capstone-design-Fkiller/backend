@@ -10,6 +10,9 @@ mysqlclient = "*"
 django-seed = "*"
 psycopg2-binary = "*"
 pymysql = "*"
+dj-rest-auth = "*"
+django-allauth = "*"
+djangorestframework-simplejwt = "*"
 
 [dev-packages]
 
