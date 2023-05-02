@@ -8,7 +8,7 @@ class User(models.Model):
     id = models.BigAutoField(primary_key=True)
     name = models.CharField(max_length=20)
     password = models.TextField() # front에서 암호화해서 보내줄 것으로 예상
-    major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
+    major = models.ForeignKey(Major, related_name="user2", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
     penalty = models.BooleanField(default=False)
     penalty_start_date = models.DateTimeField(null=True, blank=True)
     penalty_end_date = models.DateTimeField(null=True, blank=True)

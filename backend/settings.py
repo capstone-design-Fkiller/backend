@@ -42,13 +42,14 @@ INSTALLED_APPS = [
     "user",
     "account",
     "major",
+    "apply",
     "locker",
     "rest_framework",
     "rest_framework.authtoken",
     "dj_rest_auth",
     "django.contrib.sites",
     "allauth",
-    "allauth.account",
+    # "allauth.account",
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     "django_seed",
@@ -104,8 +105,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
 ]
-
-AUTH_USER_MODEL = 'account.User'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = 'id'
+ACCOUNT_USERNAME_REQUIRED = False
+AUTH_USER_MODEL = 'account.Account'
 
 
 # Internationalization

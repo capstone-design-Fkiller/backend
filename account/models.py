@@ -5,18 +5,18 @@ from major.models import Major
 
 
 # 새로운 유저를 만드는 과정 되는구나. 일반 user는 django에 있다.
-class UserManager(BaseUserManager):
+class AccountManager(BaseUserManager):
     def create_user(self, id, password=None):
         if not id:
-            raise ValueError('The Login ID must be set')
+            raise ValueError('The ID must be set')
 
         user = self.model(id=id)
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-class User(AbstractBaseUser, PermissionsMixin):
-    id = models.CharField(max_length=50, unique=True)
+class Account(AbstractBaseUser, PermissionsMixin):
+    id = models.BigIntegerField(unique=True, primary_key=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 얘는 없애야 돼
 
@@ -30,7 +30,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_valid = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = UserManager()
+    objects = AccountManager()
 
     USERNAME_FIELD = 'id'
     # REQUIRED_FIELDS = []
@@ -40,7 +40,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
         #verbose_name = "User"
         #verbose_name_plural = "Users"
-        db_table = "users"
+        db_table = "accounts"
     
     def __str__(self):
         return self.id
