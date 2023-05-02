@@ -5,7 +5,7 @@ from major.models import Major
 
 
 # 새로운 유저를 만드는 과정 되는구나. 일반 user는 django에 있다.
-class AccountManager(BaseUserManager):
+class AccountsManager(BaseUserManager):
     def create_user(self, id, password=None):
         if not id:
             raise ValueError('The ID must be set')
@@ -15,7 +15,7 @@ class AccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
 
-class Account(AbstractBaseUser, PermissionsMixin):
+class Accounts(AbstractBaseUser, PermissionsMixin):
     id = models.BigIntegerField(unique=True, primary_key=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 얘는 없애야 돼
@@ -30,7 +30,7 @@ class Account(AbstractBaseUser, PermissionsMixin):
     is_valid = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    objects = AccountManager()
+    objects = AccountsManager()
 
     USERNAME_FIELD = 'id'
     # REQUIRED_FIELDS = []

@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "user",
-    "account",
+    "accounts",
     "major",
     "apply",
     "locker",
@@ -49,7 +49,7 @@ INSTALLED_APPS = [
     "dj_rest_auth",
     "django.contrib.sites",
     "allauth",
-    # "allauth.account",
+    "allauth.account",
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     "django_seed",
@@ -107,7 +107,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'id'
 ACCOUNT_USERNAME_REQUIRED = False
-AUTH_USER_MODEL = 'account.Account'
+AUTH_USER_MODEL = 'accounts.Accounts'
 
 
 # Internationalization
