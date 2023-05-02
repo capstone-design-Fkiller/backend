@@ -16,13 +16,14 @@ class AccountsManager(BaseUserManager):
         return user
 
 class Accounts(AbstractBaseUser, PermissionsMixin):
-    id = models.BigIntegerField(unique=True, primary_key=True)
+    id = models.CharField(max_length=50, unique=True, primary_key=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 얘는 없애야 돼
 
     name = models.CharField(max_length=20)
     # password = models.TextField() # front에서 암호화해서 보내줄 것으로 예상
-    major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
+    major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major", null=True, blank=True) #related_name = user로 수정
+    
     penalty = models.BooleanField(default=False)
     penalty_start_date = models.DateTimeField(null=True, blank=True)
     penalty_end_date = models.DateTimeField(null=True, blank=True)

@@ -5,6 +5,17 @@ from django.http import Http404
 
 from accounts.models import Accounts
 from accounts.serializers import AccountsPostSerializer, AccountsSerializer
+
+# views.py
+
+from dj_rest_auth.registration.views import RegisterView
+from .serializers import MyUserRegistrationSerializer
+
+class MyUserRegistrationView(RegisterView):
+    serializer_class = MyUserRegistrationSerializer
+
+
+
 # 갈 예정
 class AccountsAPIView(APIView):
     def get(self, request):

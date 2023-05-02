@@ -107,6 +107,10 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 ACCOUNT_USER_MODEL_USERNAME_FIELD = 'id'
 ACCOUNT_USERNAME_REQUIRED = False
+REST_AUTH_REGISTER_SERIALIZERS = {
+    'REGISTER_SERIALIZER': 'accounts.serializers.MyUserRegistrationSerializer'
+}
+
 AUTH_USER_MODEL = 'accounts.Accounts'
 
 

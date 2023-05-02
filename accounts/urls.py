@@ -7,6 +7,8 @@ urlpatterns = [
     path('accounts/<int:pk>', views.AccountsDetail.as_view()),
     path('', include('dj_rest_auth.urls')),
     path('registration/', include('dj_rest_auth.registration.urls')),
+    path('auth/registration/', views.MyUserRegistrationView.as_view(), name='myuser_register'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
