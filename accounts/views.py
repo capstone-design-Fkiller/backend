@@ -1,6 +1,11 @@
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth.backends import ModelBackend
+from dj_rest_auth.views import LoginView
+from django.contrib.auth import authenticate, get_user_model
 from django.http import Http404
 
 from accounts.models import Accounts
@@ -8,6 +13,7 @@ from accounts.serializers import AccountsPostSerializer, AccountsSerializer
 
 from dj_rest_auth.registration.views import RegisterView
 from .serializers import MyUserRegistrationSerializer
+from .serializers import LoginSerializer
 
 class MyUserRegistrationView(RegisterView):
     serializer_class = MyUserRegistrationSerializer
@@ -27,7 +33,7 @@ class AccountsAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class AccountsDetail(APIView):
     def get_object(self, pk):
         try:
@@ -55,3 +61,31 @@ class AccountsDetail(APIView):
         account = self.get_object(pk)
         account.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+# class LoginView(generics.GenericAPIView):
+#     serializer_class = LoginSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         user_id = serializer.validated_data['id']
+#         password = serializer.validated_data['password']
+
+#         user = authenticate(request, username=user_id, password=password)
+
+#         if not user:
+#             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+#         refresh = RefreshToken.for_user(user)
+
+#         return Response({
+#             'user': {
+#                 'id': user.id
+#             },
+#             'refresh': str(refresh),
+#             'access': str(refresh.access_token)
+#         })
+
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer

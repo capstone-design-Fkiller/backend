@@ -3,6 +3,8 @@ from .models import Accounts
 from rest_framework import serializers
 from major.models import Major
 from dj_rest_auth.registration.serializers import RegisterSerializer
+from django.contrib.auth import authenticate
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class MyUserRegistrationSerializer(RegisterSerializer):
     # username=None
@@ -38,8 +40,6 @@ class MyUserRegistrationSerializer(RegisterSerializer):
         model = Accounts
         fields = ('id', 'name', 'password1', 'password2', 'major')
 
-
-
     # def validate_username(self, value):
     #     if Accounts.objects.filter(username=value).exists():
     #         raise serializers.ValidationError('Username already exists.')
@@ -66,7 +66,6 @@ class MyUserRegistrationSerializer(RegisterSerializer):
     #     adapter.save_user(request, user, self)
     #     return user
 
-
 class AccountsSerializer(serializers.ModelSerializer):
     # major = serializers.CharField(source='major.name')  # major 필드에 user.major.name 값을 serialize -> {major = "ELLT"} 로 출력
     # major = MajorNameSerializer() # {major = {"name": ELLT"}} 로 출력 Major model에서 field를 name만 설정한 것.
@@ -83,3 +82,33 @@ class AccountsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
         fields = '__all__'
+
+
+# class LoginSerializer(serializers.Serializer):
+#     id = serializers.CharField()
+#     password = serializers.CharField()
+
+#     def validate(self, data):
+#         user = authenticate(request=self.context.get('request'),
+#                             username=data.get('id'),
+#                             password=data.get('password'))
+
+#         if not user:
+#             raise serializers.ValidationError('Invalid credentials')
+
+#         data['user'] = user
+#         return data
+
+class LoginSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['id'] = user.id
+        token['password'] = user.password
+
+        return token
+
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        return data
