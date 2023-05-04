@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     "apply",
     "locker",
     "rest_framework",
+    "drf_yasg",
     "rest_framework.authtoken",
     "dj_rest_auth",
     "django.contrib.sites",
