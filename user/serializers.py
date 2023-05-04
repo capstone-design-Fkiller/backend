@@ -36,8 +36,8 @@ class UserRegistrationSerializer(RegisterSerializer):
     def validate_major(self, value):
         # if not value:
             # return None
-        if value and not isinstance(value, int):
-            raise serializers.ValidationError("Major value must be an integer.")
+        if value and not isinstance(value.pk, int) and not isinstance(value.name, str):
+            raise serializers.ValidationError("Major value has wrong type value.")
         return value
     
     def validate_is_admin(self, value):
