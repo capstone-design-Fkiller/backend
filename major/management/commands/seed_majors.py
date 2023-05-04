@@ -4,7 +4,7 @@ from major.models import Major
 from itertools import cycle
 
 class Command(BaseCommand):
-    help = 'Seed User data'
+    help = 'Seed Major data'
 
     # def add_arguments(self, parser):
     #     parser.add_argument(
