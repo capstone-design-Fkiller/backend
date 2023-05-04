@@ -2,6 +2,69 @@ from major.serializers import MajorSerializer, MajorNameSerializer
 from .models import Accounts
 from rest_framework import serializers
 from major.models import Major
+from dj_rest_auth.registration.serializers import RegisterSerializer
+
+class MyUserRegistrationSerializer(RegisterSerializer):
+    # username=None
+    password1 = serializers.CharField(write_only=True)
+    password2 = serializers.CharField(write_only=True)
+    major = serializers.PrimaryKeyRelatedField(allow_null=True, required=False, queryset=Major.objects.all()) #얘가 생기니까 major 필드가 생기더라
+
+    # username 필드를 Serializer에서 제거
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['id'] = serializers.CharField(required=True, max_length=50)
+        self.fields['name'] = serializers.CharField(allow_blank=True, required=False, max_length=50, default="")
+        self.fields.pop('username')
+        self.fields.pop('email')
+
+    def validate_id(self, id):
+        if Accounts.objects.filter(id=id).exists():
+            raise serializers.ValidationError(
+                'A user with that id already exists.')
+        return id
+
+    def custom_signup(self, request, user):
+        user.set_password(self.validated_data['password1'])
+        major = self.validated_data.get('major') # 이녀석이 요물
+        user.major = major
+        id = self.validated_data.get('id')
+        user.id = id
+        user.name = self.validated_data.get('name')
+        user.save()
+        # user.save(update_fields=['id'])
+
+    class Meta:
+        model = Accounts
+        fields = ('id', 'name', 'password1', 'password2', 'major')
+
+
+
+    # def validate_username(self, value):
+    #     if Accounts.objects.filter(username=value).exists():
+    #         raise serializers.ValidationError('Username already exists.')
+    #     return value
+
+
+# drf에서는 cleaned_data 없음 그냥 validated_data만 사용
+    # def get_cleaned_data(self):
+    #     data_dict = super().get_cleaned_data()
+    #     data_dict['id'] = self.validated_data.get('id')
+    #     data_dict['password1'] = self.validated_data.get('password1')
+    #     data_dict['password2'] = self.validated_data.get('password2')
+    #     data_dict['major'] = self.validated_data.get('major')
+    #     return data_dict
+    
+    # adapter도 사용 불가
+    # def save(self, request):
+    #     adapter = get_adapter()
+    #     user = Accounts(
+    #         id=self.validated_data.get('id'),
+    #         password=self.validated_data.get('password1'),
+    #         is_active=False,
+    #     )
+    #     adapter.save_user(request, user, self)
+    #     return user
 
 
 class AccountsSerializer(serializers.ModelSerializer):
@@ -20,32 +83,3 @@ class AccountsPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = Accounts
         fields = '__all__'
-
-# serializers.py
-
-from dj_rest_auth.registration.serializers import RegisterSerializer
-
-class MyUserRegistrationSerializer(RegisterSerializer):
-    # username=None
-    password1 = serializers.CharField(write_only=True)
-    password2 = serializers.CharField(write_only=True)
-    major = serializers.PrimaryKeyRelatedField(queryset=Major.objects.all()) #얘가 생기니까 major 필드가 생기더라
-    
-    # def get_cleaned_data(self):
-        # data_dict = super().get_cleaned_data()
-        # data_dict['major'] = self.validated_data.get('major')
-        # return data_dict
-
-    def custom_signup(self, request, user):
-        user.set_password(self.validated_data['password1'])
-        major = self.validated_data.get('major') # 이녀석이 요물
-        user.major = major 
-        # id = self.validated_data.get('id')
-        # user.id = id
-        # user.id = self.cleaned_data.get('id') # 이거 만드니 major가 없어진다. 
-        # user.save(update_fields=['id'])
-        user.save()
-
-    class Meta:
-        model = Accounts
-        fields = ('id', 'password1', 'password2', 'major')

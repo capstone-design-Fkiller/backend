@@ -20,7 +20,7 @@ class Accounts(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 얘는 없애야 돼
 
-    name = models.CharField(max_length=20)
+    name = models.CharField(max_length=20, default="")
     # password = models.TextField() # front에서 암호화해서 보내줄 것으로 예상
     major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major", null=True, blank=True) #related_name = user로 수정
     
