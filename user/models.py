@@ -1,117 +1,87 @@
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
 from major.models import Major
 
-# Create your models here.
 
-class User(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    name = models.CharField(max_length=20)
-    password = models.TextField() # front에서 암호화해서 보내줄 것으로 예상
-    major = models.ForeignKey(Major, related_name="user2", on_delete=models.PROTECT, db_column="major") #related_name = user로 수정
+# 새로운 유저를 만드는 과정 되는구나. 일반 user는 django에 있다.
+class UserManager(BaseUserManager):
+    def create_user(self, id, password=None, major=None, **extra_fields):
+        if not id:
+            raise ValueError('The ID must be set')
+        user = self.model(id=id, major=major, **extra_fields) #extra_fields가 다 알아서 넣어준다.
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+class User(AbstractBaseUser, PermissionsMixin):
+    id = models.CharField(max_length=50, unique=True, primary_key=True)
+    is_active = models.BooleanField(default=True) # 생성하면 false 아닌가? 로그인해야 트루로 바뀌는 게 맞는 거 같은데 필요없으면 지우자.
+    # is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 - 얘는 없애야 돼
+    name = models.CharField(max_length=20, default="")
+    major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major", null=True, blank=True) #related_name = user로 수정
     penalty = models.BooleanField(default=False)
     penalty_start_date = models.DateTimeField(null=True, blank=True)
     penalty_end_date = models.DateTimeField(null=True, blank=True)
-    id_card_img = models.TextField(default='', blank=True) # 길이 제한을 없애기 위해 text로 교체
-    is_valid = models.BooleanField(default=True)
+    id_card_img = models.TextField(default='') # 길이 제한을 없애기 위해 text로 교체
+    is_admin = models.BooleanField(default=False)
+    is_valid = models.BooleanField(default=True) # 없어도 될 거 같은데
     created_at = models.DateTimeField(auto_now_add=True)
+    # password = models.TextField() # 얘는 장고가 알아서 생성해주는 걸로
 
-    class Meta:
-        db_table = 'user'
+    objects = UserManager()
 
-    def __str__(self):
-        return self.name
-
-
-# # 선순위----------------------------------------------------------------------------------------------------------------------------
-
-# class Major(models.Model): # 관리자들이 설정하는 학과 정보
-#     id = models.BigAutoField(primary_key=True)
-#     name = models.CharField(max_length=100) #학과명, 근데 이거는 학과명이 고유한 값으로 검색이 되어야 하는데, id로 하려면, 학과마다 번호를 붙여야할 수도 있겠다. 얘를 들어 ELLT = 17번 이렇게
-#     apply_start_date = models.DateTimeField() #신청 시작일
-#     apply_end_date = models.DateTimeField() #신청 종료일
-#     priority_first = models.CharField(max_length=100) # 학과 우선순위 기준 1 - 이거, 1대다로!!
-#     priority_second = models.CharField(max_length=100, null=True, blank=True) # 학과 우선순위 기준 2
-#     priority_third = models.CharField(max_length=100, null=True, blank=True) # 학과 우선순위 기준 3
-
-#     def __str__(self):
-#         return self.name # 학과 출력
+    USERNAME_FIELD = 'id'
+    # REQUIRED_FIELDS = []
     
-# # 조인테이블이어야 되는 것이 아닌가? 얘는 
-# class Priority1(models.Model): #애는 하나의 유저당 하나씩 만들어져야 한다. 손명근한테 우리 학과 질문, 그에 대한 답변 , 123필요 없다. 한 개만 있으면 된다. first_criteria, first_answer
-#     id = models.BigAutoField(primary_key=True)
-#     question = models.ForeignKey(Major, related_name="priority1", on_delete=models.PROTECT, db_column="question") #Major의 pk, 즉 id를 가져온다.
-#     answer = models.ForeignKey(Apply, related_name="priority1", on_delete=models.PROTECT, db_column="answer") #Major의 pk, 즉 id를 가져온다.
-#     # answer = models.CharField(max_length=100) #apply의 자식으로 답을 받아 오도록
-#     # question = models.CharField(max_length=100, unique=True) #major의 자식으로 해서 first질문 받아 오도록
+    class Meta:
+        """Meta definition for User."""
 
-# class Priority2(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     question = models.CharField(max_length=100, unique=True, null=True, blank=True)
-#     answer = models.CharField(max_length=100, null=True, blank=True) # 1대 다로 만들어서 가져올 수 있도록.
+        #verbose_name = "User"
+        #verbose_name_plural = "Users"
+        db_table = "user"
+    
+    def __str__(self):
+        return self.id
+    
 
-# class Priority3(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     question = models.CharField(max_length=100, unique=True, null=True, blank=True)
-#     answer = models.CharField(max_length=100, null=True, blank=True)
+    # def create_user(self, id, password=None):
+    #     if not id:
+    #         raise ValueError('The ID must be set')
 
-# class Apply(models.Model): #학생이 신청할 때 폼이다.
-#     id = models.BigAutoField(primary_key=True)
-#     major = models.ForeignKey(Major, related_name="apply", on_delete=models.PROTECT, db_column="major") #Major의 pk, 즉 id를 가져온다.
-#     user = models.ForeignKey(User, related_name="apply", on_delete=models.PROTECT, db_column="user") # 이름
-#     priority_1_answer = models.CharField(max_length=100)
-#     priority_2_answer = models.CharField(max_length=100)
-#     priority_3_answer = models.CharField(max_length=100)
-#     # priority_1 = models.ForeignKey(Priority1, on_delete=models.PROTECT, related_name='apply_1', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
-#     # priority_2 = models.ForeignKey(Priority2, on_delete=models.PROTECT, related_name='apply_2', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
-#     # priority_3 = models.ForeignKey(Priority3, on_delete=models.PROTECT, related_name='apply_3', null=True, blank=True) #이거 이런식으로 쓰면 안된다. priority_1_answer = models.CharField(max_length=100) 이렇게 가야 한다. 얘는 입력을 받아야 한다. 외래키를 받는 게 아니라
-
-# # major 도 있어야 할 거 같다.
-# class Building(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     name = models.CharField(max_length=20)
-
-# class Locker(models.Model): # 얘 만들려면 major db가 먼저 있어야 한다.
-#     id = models.BigAutoField(primary_key=True)
-#     building_id = models.IntegerField() # 빌딩은 int로 잘 되었고,
-#     major = models.ForeignKey(Major, related_name="locker", on_delete=models.PROTECT, db_column="major") # 맞는지 모르겠다.
-#     owned_id = models.ForeignKey(User, related_name='owned_locker', on_delete=models.PROTECT, db_column="owned_id", null=True, blank=True) # 이건 맞고 
-#     shared_id = models.ForeignKey(User, related_name='shared_locker', on_delete=models.PROTECT, db_column="shared_id", null=True, blank=True) # 이것도 맞다.
-#     is_share_registered = models.BooleanField(default=False) # 쉐어를 하겠다고 등록한 경우
-#     start_date = models.DateTimeField(null=True, blank=True) # 대여 시작 날짜, 대여라는 이름을 붙여야겠다. 이름 헷갈린다.
-#     end_date = models.DateTimeField(null=True, blank=True) # 대여 종료 날짜, 대여라는 이름을 붙여야겠다. 이름 헷갈린다.
-#     share_start_date = models.DateTimeField(null=True, blank=True) # 쉐어 시작 날짜
-#     share_end_date = models.DateTimeField(null=True, blank=True) # 쉐어 종료 날짜
-
-# # 후순위----------------------------------------------------------------------------------------------------------------------------
-
-# #관리자 나중에
-# class Admin(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     name = models.CharField(max_length=100)
-#     password = models.CharField(max_length=100)
-#     major = models.ForeignKey(Major, related_name="admin", on_delete=models.PROTECT, db_column="major")
-
-#     def __str__(self):
-#         return self.name
+    #     user = self.model(id=id)
+    #     user.set_password(password)
+    #     major = self.validated_data.get('major') # 이녀석이 요물
+    #     user.major = major
+    #     id = self.validated_data.get('id')
+    #     user.id = id
+    #     user.name = self.validated_data.get('name')
+    #     user.save(using=self._db)
 
 
-# # 게시글 나중에
-# class Article(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     writer_id = models.ForeignKey(User, related_name="article", on_delete=models.PROTECT, db_column="writer_id")
-#     title = models.CharField(max_length=100)
-#     content = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
-#     major = models.ForeignKey(Major, related_name="article", on_delete=models.PROTECT, db_column="major")
+    #     return user
 
-#     def __str__(self):
-#         return self.title
 
-# # 메시지 나중에
-# class Message(models.Model):
-#     id = models.BigAutoField(primary_key=True)
-#     writer_id = models.ForeignKey(User, related_name="user", on_delete=models.PROTECT, related_name='sent_messages', db_column="writer_id")
-#     receiver_id = models.ForeignKey(User, related_name="user", on_delete=models.PROTECT, related_name='received_messages', db_column="receiver_id")
-#     content = models.TextField()
-#     created_at = models.DateTimeField(auto_now_add=True)
+
+
+# # 승희님 코드
+
+# from accounts.validators import validate_username
+# import re
+# from django.core.exceptions import ValidationError
+# from django.utils.translation import gettext_lazy as _
+
+# def validate_username(username):
+#     username_reg = r"^(?=.*[a-z])(?=.*\d)[a-z\d]{6,13}$"
+#     username_regex = re.compile(username_reg)
+
+#     if not username_regex.match(username):
+#         raise ValidationError("영문+숫자 6자리 이상, 13자리 이하로 아이디 조합되어야합니다.")
+
+
+# def validate_password(password):
+#     password_reg = r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[$@$!%*#?&])[A-Za-z\d$@$!%*#?&]{6,13}$"
+#     password_regex = re.compile(password_reg)
+
+#     if not password_regex.match(password):
+#         raise ValidationError("영문, 숫자, 특수문자 조합해 6자 이상, 13자 이하 입력해주세요.")

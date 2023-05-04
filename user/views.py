@@ -1,10 +1,27 @@
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from django.contrib.auth.backends import ModelBackend
+from dj_rest_auth.views import LoginView
+from django.contrib.auth import authenticate, get_user_model
 from django.http import Http404
 
 from user.models import User
-from user.serializers import UserPostSerializer, UserSerializer, UserMajorSerializer
+from user.serializers import UserPostSerializer, UserSerializer
+
+from dj_rest_auth.registration.views import RegisterView
+from .serializers import UserRegistrationSerializer
+from .serializers import LoginSerializer
+
+class MyUserRegistrationView(RegisterView):
+    serializer_class = UserRegistrationSerializer
+
+
+class LoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+
 
 class UserAPIView(APIView):
     def get(self, request):
@@ -48,28 +65,31 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
-class UserMajor(APIView):
-    def get_queryset(self):
-        return User.objects.filter(major__id="1")
-    
-    # UserMajor 조회하기
-    def get(self, request, format=None):
-        user_major = self.get_queryset()
-        serializer = UserMajorSerializer(user_major, many=True)
-        return Response(serializer.data)
 
-    # UserMajor 수정하기
-    def put(self, request, format=None):
-        user_major = self.get_queryset()
-        serializer = UserMajorSerializer(user_major, data=request.data) 
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data) 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # UserMajor 삭제하기
-    def delete(self, request, format=None):
-        user_major = self.get_queryset()
-        user_major.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+# # 로그인뷰 다른 방식
+# class LoginView(generics.GenericAPIView):
+#     serializer_class = LoginSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         serializer = self.get_serializer(data=request.data)
+#         serializer.is_valid(raise_exception=True)
+
+#         user_id = serializer.validated_data['id']
+#         password = serializer.validated_data['password']
+
+#         user = authenticate(request, username=user_id, password=password)
+
+#         if not user:
+#             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
+
+#         refresh = RefreshToken.for_user(user)
+
+#         return Response({
+#             'user': {
+#                 'id': user.id
+#             },
+#             'refresh': str(refresh),
+#             'access': str(refresh.access_token)
+#         })

@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "user",
-    "accounts",
     "major",
     "apply",
     "locker",
@@ -110,7 +109,7 @@ ACCOUNT_USER_MODEL_USERNAME_FIELD = 'id'
 ACCOUNT_USERNAME_REQUIRED = False
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'accounts.serializers.MyUserRegistrationSerializer'
+    'REGISTER_SERIALIZER': 'user.serializers.MyUserRegistrationSerializer'
 }
 
 REST_FRAMEWORK = {
@@ -127,7 +126,7 @@ SIMPLE_JWT = {
 }
 
 
-AUTH_USER_MODEL = 'accounts.Accounts'
+AUTH_USER_MODEL = 'user.User'
 
 
 # Internationalization
