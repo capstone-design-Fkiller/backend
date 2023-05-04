@@ -12,11 +12,12 @@ class UserManager(BaseUserManager):
         user = self.model(id=id, major=major, **extra_fields) #extra_fields가 다 알아서 넣어준다.
         user.set_password(password)
         user.save(using=self._db)
+        major, created = Major.objects.get_or_create(name="ELLT") # User가 생성되면 major name이 ELLT인 데이터가 없을 경우 하나만 생성함.
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.CharField(max_length=50, unique=True, primary_key=True)
-    is_active = models.BooleanField(default=True) # 생성하면 false 아닌가? 로그인해야 트루로 바뀌는 게 맞는 거 같은데 필요없으면 지우자.
+    is_active = models.BooleanField(default=True) # 이 서비스를 사용가능한 유저 여부
     # is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 - 얘는 없애야 돼
     name = models.CharField(max_length=20, default="")
     major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major", null=True, blank=True) #related_name = user로 수정

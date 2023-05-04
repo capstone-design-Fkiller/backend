@@ -4,65 +4,60 @@ from major.models import Major
 from dj_rest_auth.registration.serializers import RegisterSerializer
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from django.contrib.auth import authenticate
+from django.core.exceptions import ValidationError as DjangoValidationError
+from allauth.account.adapter import get_adapter
 
 # 회원가입 시리얼라이저
 class UserRegistrationSerializer(RegisterSerializer):
-    # username=None
+    id = serializers.CharField(required=True)
+    major = serializers.PrimaryKeyRelatedField(allow_null=True, required=False, queryset=Major.objects.all()) #얘가 생기니까 major 필드가 생기더라
     password1 = serializers.CharField(write_only=True)
     password2 = serializers.CharField(write_only=True)
-    major = serializers.PrimaryKeyRelatedField(allow_null=True, required=False, queryset=Major.objects.all()) #얘가 생기니까 major 필드가 생기더라
+    # password1 = serializers.CharField(write_only=True, style={'input_type': 'password', 'autocomplete': 'new-password'}) #비밀번호 필드 형식으로 바뀌게 됨!
+    # password2 = serializers.CharField(write_only=True, style={'input_type': 'password', 'autocomplete': 'new-password'})
+    name = serializers.CharField(allow_blank=True, required=False, max_length=50, default="")
+    is_admin = serializers.BooleanField(required=False, default=False)
 
-    # username 필드를 Serializer에서 제거
+    # username 필드와 email필드를 Serializer에서 제거
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['id'] = serializers.CharField(required=True, max_length=50)
-        self.fields['name'] = serializers.CharField(allow_blank=True, required=False, max_length=50, default="")
-        self.fields['is_admin'] = serializers.BooleanField(required=False, default=False)
-        self.fields.pop('username')
+        self.fields.pop('username') #이렇게 하면 기본으로 있는 필드를 지울 수 있다.
         self.fields.pop('email')
 
+    #나머지 validate는 RegisterSerializer가 알아서 한다.
     def validate_id(self, id):
+        if not isinstance(id, str):
+            raise serializers.ValidationError("id should be a string")
         if User.objects.filter(id=id).exists():
             raise serializers.ValidationError(
                 'A user with that id already exists.')
         return id
     
+    def validate_major(self, value):
+        # if not value:
+            # return None
+        if value and not isinstance(value, int):
+            raise serializers.ValidationError("Major value must be an integer.")
+        return value
+    
+    def validate_is_admin(self, value):
+        if not isinstance(value, bool):
+            raise serializers.ValidationError("is_admin field must be a boolean value")
+        return value
+    
+    def validate_name(self, value):
+        if not isinstance(value, str):
+            raise serializers.ValidationError("Name should be a string")
+        return value
+    
     
     def save(self, request):
-        # user.set_password(self.validated_data['password1'])
         major = self.validated_data.get('major')
         id = self.validated_data.get('id')
         name = self.validated_data.get('name')
         is_admin = self.validated_data.get('is_admin') #관리자로 회원가입 추가
         user = User.objects.create_user(id=id, name=name, password=self.validated_data['password1'], major=major, is_admin=is_admin)
-        # adapter = get_adapter()
-        # user = adapter.new_user(request)
-        # self.cleaned_data = self.get_cleaned_data()
-        # user = adapter.save_user(request, user, self, commit=False)
-        # if "password1" in self.cleaned_data:
-            # try:
-                # adapter.clean_password(self.cleaned_data['password1'], user=user)
-            # except DjangoValidationError as exc:
-                # raise serializers.ValidationError(
-                    # detail=serializers.as_serializer_error(exc)
-            # )
-        # user.save()
-        # self.custom_signup(request, user)
-        # setup_user_email(request, user, [])
         return user
-
-    # def custom_signup(self, request, user):
-    #     user.set_password(self.validated_data['password1'])
-    #     major = self.validated_data.get('major') # 이녀석이 요물
-    #     id = self.validated_data.get('id')
-    #     name = self.validated_data.get('name')
-    #     User.objects.create_user(user=user, id=id, name=name, password=self.validated_data['password1'], major=major)
-    #     user.major = major
-    #     user.id = id
-    #     user.name = self.validated_data.get('name')
-
-    #     user.save()
-    #     # user.save(update_fields=['id'])
 
     class Meta:
         model = User
@@ -73,13 +68,28 @@ class LoginSerializer(TokenObtainPairSerializer):
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
-        token['id'] = user.id
-        token['password'] = user.password
+        # token['id'] = user.id
+        # token['password'] = user.password
+        print("출력해봐", token)
 
         return token
 
     def validate(self, attrs):
         data = super().validate(attrs)
+
+        refresh_token = self.get_token(self.user)
+
+        user = authenticate(request=self.context.get('request'),
+                            id=attrs.get('id'),
+                            password=attrs.get('password'))
+
+        if not user:
+            raise serializers.ValidationError('Invalid credentials')
+
+        data["refresh_token"] = str(refresh_token)
+        data["access_token"] = str(refresh_token.access_token)
+        # data['user'] = user
+        # data['user'] = UserSerializer(data=self.user).data
 
         return data
 
@@ -102,7 +112,7 @@ class UserPostSerializer(serializers.ModelSerializer):
 
 
 
-# 로그인 시리얼라이저 다른 방식
+# # 로그인 시리얼라이저 다른 방식
 # class LoginSerializer(serializers.Serializer):
 #     id = serializers.CharField()
 #     password = serializers.CharField()
