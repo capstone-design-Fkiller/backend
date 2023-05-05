@@ -13,40 +13,24 @@ class Command(BaseCommand):
     #         "--total",
     #         default=3,
     #         type=int,
-    #         help="몇 개의 전공을 만드는지"
+    #         help="몇 개의 유저를 만드는지"
     #     )
 
     #     return
 
     def handle(self, *args, **options):
-        # total = options.get("tatal")
-        seeder = Seed.seeder()
 
-        # 학과개수 32개
-        names = cycle(['프랑스어학부','독일어과','노어과','스페인어과','이탈리아어과',
-                       '포르투갈어과','네덜란드어과','스칸디나비아어과','말레이인도네시아어과','아랍어과',
-                       '태국어과','베트남어과','인도어과','터키아제르바이잔어과','페르시아어이란학과',
-                       '몽골어과','ELLT학과','영미문학문화학과','EICC','중국학대학',
-                       '일본학대학','정치외교학과','행정학과','영어교육과','한국어교육과',
-                       '프랑스어교육과','독일어교육과','중국어교육과','상경대학','경영학부',
-                       '국제학부',"LD학부"])
-        
-        # major:1
-        # id :1
-        # password: "qetu1357!"
-        # name:""
-        # is_admin: False
-        # # 안되면 필요할 수 있음.
-        # User.objects.create_user(id=id, name=name, password=self.validated_data['password1'], major=major, is_admin=is_admin)
+        names = ['최희락', '최성민', '유지민', '정나윤', '손명근']
+        ids = ['2016', '2017', '2018', '2019', '201801911']
+        majors= [24, 4, 19, 24, 17]
+        # passwords = [] # 프론트에서 암호화해서 넘겨주면 암호화된 키 값들로 또 암호화해야함.
 
-        seeder.add_entity(User, 32, {
-            'name': lambda x: next(names),
-            'apply_start_date': None,
-            'apply_end_date': None,
-            'priority_first': None,
-            'priority_second': None,
-            'priority_third': None,
-        })
+        for i in range(len(names)):
+            id = ids[i]
+            password = 'qwer1234!' # 프론트 암호화 키로 변경 예정
+            name = names[i]
+            major=Major.objects.filter(pk=majors[i]).first()
+            is_usermode = True
+            User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode)
 
-        seeder.execute()
         self.stdout.write(self.style.SUCCESS("Success!"))
