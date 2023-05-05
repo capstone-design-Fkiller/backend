@@ -25,7 +25,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     penalty_end_date = models.DateTimeField(null=True, blank=True)
     id_card_img = models.TextField(default='') # 길이 제한을 없애기 위해 text로 교체
     is_admin = models.BooleanField(default=False)
-    is_adminable = models.BooleanField(default=False)
+    # is_adminable = models.BooleanField(default=False)
     is_valid = models.BooleanField(default=True) # 없어도 될 거 같은데
     created_at = models.DateTimeField(auto_now_add=True)
     # password = models.TextField() # 얘는 장고가 알아서 생성해주는 걸로
