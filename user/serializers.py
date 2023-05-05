@@ -65,13 +65,14 @@ class UserRegistrationSerializer(RegisterSerializer):
 
 # 로그인 시리얼라이저
 class LoginSerializer(TokenObtainPairSerializer):
+    major = serializers.PrimaryKeyRelatedField(allow_null=True, required=False, queryset=Major.objects.all()) #얘가 생기니까 major 필드가 생기더라
+    name = serializers.CharField(allow_blank=True, required=False, max_length=50, default="")
+    is_admin = serializers.BooleanField(required=False, default=False)
+
     @classmethod
     def get_token(cls, user):
         token = super().get_token(user)
         # token['id'] = user.id
-        # token['password'] = user.password
-        print("출력해봐", token)
-
         return token
 
     def validate(self, attrs):
@@ -85,13 +86,41 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         if not user:
             raise serializers.ValidationError('Invalid credentials')
+        
+        if not user.major: # major가 정해져 있지 않으면 정할 수 있게 변경
+            user.major = attrs.get('major')
+
+        if not user.name: # name이 정해져 있지 않으면 정할 수 있게 변경
+            user.name = attrs.get('name')
+
+        user.is_admin = attrs.get('is_admin') #로그인시 is_admin 값을 보내주면 그에 따라 true로 보내준다.
+        user.save(update_fields=['major', 'name', 'is_admin',])
 
         data["refresh_token"] = str(refresh_token)
         data["access_token"] = str(refresh_token.access_token)
-        # data['user'] = user
-        # data['user'] = UserSerializer(data=self.user).data
 
         return data
+    
+    def validate_major(self, value):
+        # if not value:
+            # return None
+        if value and not isinstance(value.pk, int) and not isinstance(value.name, str):
+            raise serializers.ValidationError("Major value has wrong type value.")
+        return value
+    
+    def validate_is_admin(self, value):
+        if not isinstance(value, bool):
+            raise serializers.ValidationError("is_admin field must be a boolean value")
+        return value
+    
+    def validate_name(self, value):
+        if not isinstance(value, str):
+            raise serializers.ValidationError("Name should be a string")
+        return value
+
+    class Meta:
+        model = User
+        fields = ('id', 'name', 'password1', 'password2', 'is_admin', 'major')
 
 class UserSerializer(serializers.ModelSerializer):
     major = serializers.CharField(source='major.name', allow_null=True)  # major 필드에 user.major.name 값을 serialize -> {major = "ELLT"} 로 출력

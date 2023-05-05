@@ -64,6 +64,18 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
+]
+
+CORS_ORIGIN_WHITELIST = [
+    'http://localhost:3000',
+    'https://localhost:3000',
+    'http://localhost:5713',
+    'https://localhost:5713',
+    'http://localhost:5714',
+    'https://localhost:5714',
+    'http://localhost:8001',
+    'https://localhost:8001',
 ]
 
 ROOT_URLCONF = "backend.urls"

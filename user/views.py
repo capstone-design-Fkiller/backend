@@ -59,7 +59,7 @@ class LoginView(TokenObtainPairView):
             }
             response = Response(response_data, status=status.HTTP_200_OK)
             
-            response.set_cookie("refresh_token", refresh_token, httponly=True)
+            response.set_cookie("refresh_token", refresh_token, httponly=True) # 혹시 몰라 쿠키에도 준다.
             response.set_cookie("access_token", access_token, httponly=True)
 
             return response
@@ -67,6 +67,7 @@ class LoginView(TokenObtainPairView):
             return Response(
                 {"message": "로그인에 실패하였습니다"}, status=status.HTTP_400_BAD_REQUEST
             )
+    
 
 class UserAPIView(APIView):
     def get(self, request):
