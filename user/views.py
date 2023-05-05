@@ -44,10 +44,11 @@ class LoginView(TokenObtainPairView):
         if serializer.is_valid(raise_exception=True):
             id = request.data['id']
             password = request.data['password']
+
             user = authenticate(request, username=id, password=password)
+            # user = User.objects.filter(id=id).first() # 둘 중 하나
             if not user:
                 raise serializers.ValidationError('Invalid credentials')
-            # user = User.objects.filter(id=id).first() # 둘 중 하나
             user = UserSerializer(user)
             refresh_token = serializer.validated_data.get('refresh_token') # _token을 뒤에 붙일지 고민하자.
             access_token = serializer.validated_data.get('access_token')
@@ -75,14 +76,6 @@ class UserAPIView(APIView):
 
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
-    
-    def post(self, request):
-        serializer = UserPostSerializer(data = request.data)
-        # serializer = UserSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         users = User.objects.all()

@@ -92,7 +92,7 @@ class LoginSerializer(TokenObtainPairSerializer):
 
         if not user.name: # name이 정해져 있지 않으면 정할 수 있게 변경
             user.name = attrs.get('name')
-        print("출력", attrs)
+
         user.is_usermode = attrs.get('is_usermode') #로그인시 is_usermode 값을 보내주면 그에 따라 true로 보내준다.
         user.save(update_fields=['major', 'name', 'is_usermode',])
 

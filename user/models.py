@@ -3,8 +3,6 @@ from django.db import models
 
 from major.models import Major
 
-
-# 새로운 유저를 만드는 과정 되는구나. 일반 user는 django에 있다.
 class UserManager(BaseUserManager):
     def create_user(self, id, password=None, major=None, **extra_fields):
         if not id:
@@ -17,7 +15,6 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     id = models.CharField(max_length=50, unique=True, primary_key=True)
     is_active = models.BooleanField(default=True) # 이 서비스를 사용가능한 유저 여부
-    # is_staff = models.BooleanField(default=False) # 슈퍼유저 관련 - 얘는 없애야 돼
     name = models.CharField(max_length=20, default="")
     major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major", null=True, blank=True) #related_name = user로 수정
     penalty = models.BooleanField(default=False)
@@ -28,7 +25,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_adminable = models.BooleanField(default=False)
     is_valid = models.BooleanField(default=True) # 없어도 될 거 같은데
     created_at = models.DateTimeField(auto_now_add=True)
-    # password = models.TextField() # 얘는 장고가 알아서 생성해주는 걸로
 
     objects = UserManager()
 
@@ -36,8 +32,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     # REQUIRED_FIELDS = []
     
     class Meta:
-        """Meta definition for User."""
-
         #verbose_name = "User"
         #verbose_name_plural = "Users"
         db_table = "user"
@@ -45,24 +39,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.id
     
-
-    # def create_user(self, id, password=None):
-    #     if not id:
-    #         raise ValueError('The ID must be set')
-
-    #     user = self.model(id=id)
-    #     user.set_password(password)
-    #     major = self.validated_data.get('major') # 이녀석이 요물
-    #     user.major = major
-    #     id = self.validated_data.get('id')
-    #     user.id = id
-    #     user.name = self.validated_data.get('name')
-    #     user.save(using=self._db)
-
-
-    #     return user
-
-
 
 
 # # 승희님 코드
