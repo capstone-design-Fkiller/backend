@@ -67,15 +67,23 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
+# CORS_ORIGIN_ALLOW_ALL = True # 모든 URL 허용
+CORS_ALLOW_CREDENTIALS = True # 쿠키 설정
+
+
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'http://localhost:5713',
-    'https://localhost:5713',
-    'http://localhost:5714',
-    'https://localhost:5714',
-    'http://localhost:8001',
-    'https://localhost:8001',
+    'http://127.0.0.1:3000',
+    'https://127.0.0.1:3000',
+    'http://127.0.0.1:5173',
+    'https://127.0.0.1:5173',
+    'http://127.0.0.1:5174',
+    'http://127.0.0.1:5713',
+    'https://127.0.0.1:5713',
+    'https://127.0.0.1:5174',
+    'http://127.0.0.1:5714',
+    'https://127.0.0.1:5714',
+    'http://127.0.0.1:8001',
+    'https://127.0.0.1:8001',
 ]
 
 ROOT_URLCONF = "backend.urls"
