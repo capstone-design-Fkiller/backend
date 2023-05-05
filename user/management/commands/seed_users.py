@@ -3,6 +3,8 @@ from django_seed import Seed
 from major.models import Major
 from itertools import cycle
 
+from user.models import User
+
 class Command(BaseCommand):
     help = 'Seed User data'
 
@@ -28,8 +30,16 @@ class Command(BaseCommand):
                        '일본학대학','정치외교학과','행정학과','영어교육과','한국어교육과',
                        '프랑스어교육과','독일어교육과','중국어교육과','상경대학','경영학부',
                        '국제학부',"LD학부"])
+        
+        # major:1
+        # id :1
+        # password: "qetu1357!"
+        # name:""
+        # is_admin: False
+        # # 안되면 필요할 수 있음.
+        # User.objects.create_user(id=id, name=name, password=self.validated_data['password1'], major=major, is_admin=is_admin)
 
-        seeder.add_entity(Major, 32, {
+        seeder.add_entity(User, 32, {
             'name': lambda x: next(names),
             'apply_start_date': None,
             'apply_end_date': None,

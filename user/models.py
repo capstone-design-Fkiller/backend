@@ -12,7 +12,6 @@ class UserManager(BaseUserManager):
         user = self.model(id=id, major=major, **extra_fields) #extra_fields가 다 알아서 넣어준다.
         user.set_password(password)
         user.save(using=self._db)
-        major, created = Major.objects.get_or_create(name="ELLT") # User가 생성되면 major name이 ELLT인 데이터가 없을 경우 하나만 생성함.
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
@@ -26,6 +25,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     penalty_end_date = models.DateTimeField(null=True, blank=True)
     id_card_img = models.TextField(default='') # 길이 제한을 없애기 위해 text로 교체
     is_admin = models.BooleanField(default=False)
+    is_adminable = models.BooleanField(default=False)
     is_valid = models.BooleanField(default=True) # 없어도 될 거 같은데
     created_at = models.DateTimeField(auto_now_add=True)
     # password = models.TextField() # 얘는 장고가 알아서 생성해주는 걸로
