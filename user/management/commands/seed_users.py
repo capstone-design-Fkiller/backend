@@ -30,7 +30,8 @@ class Command(BaseCommand):
             password = 'qwer1234!' # 프론트 암호화 키로 변경 예정
             name = names[i]
             major=Major.objects.filter(pk=majors[i]).first()
+            is_adminable = True # 관리자 되게 허용
             is_usermode = True
-            User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode)
+            User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode, is_adminable=is_adminable)
 
         self.stdout.write(self.style.SUCCESS("Success!"))
