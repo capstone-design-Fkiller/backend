@@ -34,4 +34,4 @@ class Command(BaseCommand):
             is_usermode = True
             User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode, is_adminable=is_adminable)
 
-        self.stdout.write(self.style.SUCCESS("Success!"))
+        self.stdout.write(self.style.SUCCESS("User data, Success!"))
