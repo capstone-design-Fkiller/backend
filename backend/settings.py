@@ -67,7 +67,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-# CORS_ORIGIN_ALLOW_ALL = True # 모든 URL 허용
+CORS_ORIGIN_ALLOW_ALL = True # 모든 URL 허용
 CORS_ALLOW_CREDENTIALS = True # 쿠키 설정
 
 
