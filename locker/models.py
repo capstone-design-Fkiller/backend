@@ -34,4 +34,4 @@ class Locker(models.Model): # 얘 만들려면 major db가 먼저 있어야 한�
         db_table = 'locker'
 
     def __str__(self):
-        return self.name
+        return str(self.id)
