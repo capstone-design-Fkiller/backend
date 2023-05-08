@@ -90,9 +90,12 @@ class UserDetail(APIView):
             raise Http404
     
     # User의 detail 보기
-    def get(self, request, pk, format=None):
+    def get(self, request, pk, format=None, **kwargs):
+        # filteredUser = User.objects.filter(**kwargs)
+
         user = self.get_object(pk)
         serializer = UserSerializer(user)
+        # serializer = UserSerializer(filteredUser)
         return Response(serializer.data)
 
     # User 수정하기
