@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.http import Http404
 
 from locker.models import Locker
-from locker.serializers import LockerSerializer
+from locker.serializers import LockerSerializer, LockerPostSerializer
 
 class LockerAPIView(APIView):
     def get(self, request, **kwargs):
@@ -23,7 +23,7 @@ class LockerAPIView(APIView):
                 return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
-        serializer = LockerSerializer(data = request.data)
+        serializer = LockerPostSerializer(data = request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
