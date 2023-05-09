@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -71,11 +72,19 @@ class LoginView(TokenObtainPairView):
     
 
 class UserAPIView(APIView):
-    def get(self, request):
-        users = User.objects.all()
+    def get(self, request, **kwargs):
+        try:
+            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+                params = request.GET
+                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+                users = User.objects.filter(**params)
+            else: # 쿼리 없을 시, 전체 데이터 요청
+                users = User.objects.all()
 
-        serializer = UserSerializer(users, many=True)
-        return Response(serializer.data)
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data)
+        except ValidationError as err:
+                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         users = User.objects.all()

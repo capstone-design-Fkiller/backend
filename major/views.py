@@ -1,3 +1,4 @@
+from django.forms import ValidationError
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -7,11 +8,19 @@ from major.models import Major
 from major.serializers import MajorSerializer
 
 class MajorAPIView(APIView):
-    def get(self, request):
-        majors = Major.objects.all()
+    def get(self, request, **kwargs):
+        try:
+            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+                params = request.GET
+                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+                majors = Major.objects.filter(**params)
+            else: # 쿼리 없을 시, 전체 데이터 요청
+                majors = Major.objects.all()
 
-        serializer = MajorSerializer(majors, many=True)
-        return Response(serializer.data)
+            serializer = MajorSerializer(majors, many=True)
+            return Response(serializer.data)
+        except ValidationError as err:
+                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
         serializer = MajorSerializer(data = request.data)
