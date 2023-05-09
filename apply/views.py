@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 
-from apply.models import Apply, Priority1
+from apply.models import Apply, Priority1, Priority2, Priority3
 from apply.serializers import ApplySerializer, PrioritySerializer
 
 class PriorityAPIView(APIView):
@@ -42,19 +42,21 @@ class ApplyAPIView(APIView):
                 return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
-        # request.data
-        # major = priority = Priority.objects.create(question=2,answer=)
-
         serializer = ApplySerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
             apply = serializer.save()
-            apply_id = apply.id
-            print(apply_id, '출력해봐~~')
-            priority1_answer = serializer.validated_data.get('priority_1_answer')
-            priority1 = Priority1.objects.create(question=serializer.validated_data['major'], answer=apply)
-            priority1.save()
-            # priority1 = Priority1.objects.create(question=serializer.validated_data['major'], answer=priority1_answer)
-            # priority1.answer = priority1_answer
+            priority_1_answer = serializer.validated_data.get("priority_1_answer")
+            priority_2_answer = serializer.validated_data.get("priority_2_answer")
+            priority_3_answer = serializer.validated_data.get("priority_3_answer")
+            if priority_1_answer:
+                priority1 = Priority1.objects.create(question=serializer.validated_data['major'], answer=apply)
+                priority1.save()
+            if priority_2_answer:
+                priority2 = Priority2.objects.create(question=serializer.validated_data['major'], answer=apply)
+                priority2.save()
+            if priority_3_answer:
+                priority3 = Priority3.objects.create(question=serializer.validated_data['major'], answer=apply)
+                priority3.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
