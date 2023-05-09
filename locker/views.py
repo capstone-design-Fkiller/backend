@@ -45,7 +45,7 @@ class LockerDetail(APIView):
     # Locker 수정하기
     def put(self, request, pk, format=None):
         locker = self.get_object(pk)
-        serializer = LockerSerializer(locker, data=request.data)
+        serializer = LockerPostSerializer(locker, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

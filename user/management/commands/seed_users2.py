@@ -17,7 +17,7 @@ class Command(BaseCommand):
         fake = Faker('ko_KR')
 
         for i in range(10):
-            id = str(random.randint(2016, 2023)) + str(random.randint(10000, 99999))
+            id = int(str(random.randint(2016, 2023)) + str(random.randint(10000, 99999)))
             password = 'qwer1234!'
             name = fake.name()
             major = majors[random.randint(0, len(majors)-1)]

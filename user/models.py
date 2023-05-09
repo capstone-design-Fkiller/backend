@@ -13,7 +13,7 @@ class UserManager(BaseUserManager):
         return user
 
 class User(AbstractBaseUser, PermissionsMixin):
-    id = models.CharField(max_length=50, unique=True, primary_key=True)
+    id = models.IntegerField(unique=True, primary_key=True)
     is_active = models.BooleanField(default=True) # 이 서비스를 사용가능한 유저 여부
     name = models.CharField(max_length=20, default="")
     major = models.ForeignKey(Major, related_name="user", on_delete=models.PROTECT, db_column="major", null=True, blank=True) #related_name = user로 수정
