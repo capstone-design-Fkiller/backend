@@ -42,7 +42,12 @@ class LockerDetail(APIView):
         serializer = LockerSerializer(locker)
         return Response(serializer.data)
 
-    # Locker 수정하기
+    # Locker 수정하기 
+    # 락커 배정 owned_id를 바꿀 때 보내면 된다
+    # owned_id가 존재하고  is_shareregistered 값이 들어온 경우, is_shareregistered를 업데이트 한다.
+    # 쉐어 신청을 하는 과정에는 is_shareregistered가 true인 사물함들을 보여준다.
+    # 쉐어 신청을 완료 할 때는 사용자의 승인 없다고 치고, 사물
+
     def put(self, request, pk, format=None):
         locker = self.get_object(pk)
         serializer = LockerPostSerializer(locker, data=request.data)
