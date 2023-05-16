@@ -1,0 +1,15 @@
+[Unit]
+Description=uWSGI service
+After=syslog.target
+
+[Service]
+ExecStart=/home/ubuntu/.local/share/virtualenvs/backend-rgN3jAOl/bin/uwsgi -i /srv/backend/.config/uwsgi/backend.ini
+
+Restart=always
+KillSignal=SIGNOUT
+Type=notify
+StandardError=syslog
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target

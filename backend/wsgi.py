@@ -11,6 +11,8 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
+#site.addsitedir('/home/ubuntu/.local/share/virtualenvs/backend-rgN3jAOl/lib/python3.11/site-packages')
+
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "backend.settings")
 
 application = get_wsgi_application()
