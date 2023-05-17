@@ -17,7 +17,7 @@ class Command(BaseCommand):
         fake = Faker()
 
         seeder.add_entity(Apply, 80, {
-            'major': Major.objects.filter(id=2).first(), # 테스트 용으로 독일어과만으로 신청
+            'major': lambda x: Major.objects.filter(id__in=[2, 3]).order_by('?').first(), # 테스트 용
             # 'major': lambda x: Major.objects.order_by('?').first(), # 학과 랜덤으로 신청
             'user': lambda x: User.objects.order_by('?').first(),
             'building_id': lambda x: Building.objects.filter(id__in=[1, 4]).order_by('?').first(),

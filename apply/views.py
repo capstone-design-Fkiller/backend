@@ -1,11 +1,12 @@
 from django.forms import ValidationError
 from rest_framework import status
+from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 from django.core.management import call_command
 
-from apply.models import Apply, Sort, Priority1, Priority2, Priority3
+from apply.models import Apply, Sort
 from apply.serializers import ApplySerializer, ApplyPostSerializer, SortSerializer, SortPostSerializer
 
 
@@ -26,19 +27,20 @@ class ApplyAPIView(APIView):
     def post(self, request):
         serializer = ApplySerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
-            apply = serializer.save()
-            priority_1_answer = serializer.validated_data.get("priority_1_answer")
-            priority_2_answer = serializer.validated_data.get("priority_2_answer")
-            priority_3_answer = serializer.validated_data.get("priority_3_answer")
-            if priority_1_answer:
-                priority1 = Priority1.objects.create(question=serializer.validated_data['major'], answer=apply)
-                priority1.save()
-            if priority_2_answer:
-                priority2 = Priority2.objects.create(question=serializer.validated_data['major'], answer=apply)
-                priority2.save()
-            if priority_3_answer:
-                priority3 = Priority3.objects.create(question=serializer.validated_data['major'], answer=apply)
-                priority3.save()
+            serializer.save()
+            # apply = serializer.save()
+            # priority_1_answer = serializer.validated_data.get("priority_1_answer")
+            # priority_2_answer = serializer.validated_data.get("priority_2_answer")
+            # priority_3_answer = serializer.validated_data.get("priority_3_answer")
+            # if priority_1_answer:
+            #     priority1 = Priority1.objects.create(question=serializer.validated_data['major'], answer=apply)
+            #     priority1.save()
+            # if priority_2_answer:
+            #     priority2 = Priority2.objects.create(question=serializer.validated_data['major'], answer=apply)
+            #     priority2.save()
+            # if priority_3_answer:
+            #     priority3 = Priority3.objects.create(question=serializer.validated_data['major'], answer=apply)
+            #     priority3.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
@@ -106,8 +108,7 @@ class SortDetail(APIView):
         apply.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-# sort_apply_data 명령을 실행
-class SortApplyDataView(APIView):
-    def post(self, request, format=None):
-        call_command('sort_apply')
-        return Response({'message': 'Apply data sorted successfully!'})
+# sort_apply 명령을 실행
+def sort_apply_command_view(request):
+    call_command('sort_apply')
+    return Response({'message': 'Apply data sorted successfully!'})

@@ -7,6 +7,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         applies = Apply.objects.all().order_by(
+            'major',
             '-priority_1_answer',
             '-priority_2_answer',
             '-priority_3_answer',
@@ -19,6 +20,7 @@ class Command(BaseCommand):
             sort_instance = Sort(
                 priority=priority,
                 apply=apply,
+                user=apply.user,
                 building_id=apply.building_id,
                 created_at=apply.created_at,
                 major=apply.major,
