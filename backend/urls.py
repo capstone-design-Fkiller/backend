@@ -47,5 +47,6 @@ urlpatterns = [
     path('', include('user.urls')),
     path('', include('major.urls')),
     path('', include('locker.urls')),
-    path('', include('apply.urls'))
+    path('', include('apply.urls')),
+    #path('', include('sort.urls'))
 ]

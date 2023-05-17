@@ -3,29 +3,11 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
+from django.core.management import call_command
 
-from apply.models import Apply, Priority1, Priority2, Priority3
-from apply.serializers import ApplySerializer, PrioritySerializer
+from apply.models import Apply, Sort, Priority1, Priority2, Priority3
+from apply.serializers import ApplySerializer, ApplyPostSerializer, SortSerializer, SortPostSerializer
 
-class PriorityAPIView(APIView):
-    def get(self, request):
-        try:
-            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
-                params = request.GET
-                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
-                priorities = Priority1.objects.filter(**params)
-            else: # 쿼리 없을 시, 전체 데이터 요청
-                priorities = Priority1.objects.all()
-            serializer = PrioritySerializer(priorities, many=True)
-            return Response(serializer.data)
-        except ValidationError as err:
-                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # def post(self, request, format=None):
-    #     serializer = PrioritySerializer(data=request.data)
-    #     serializer.is_valid(raise_exception=True)  # 유효성 검사 실패 시 예외 발생
-    #     serializer.save()  # serializer를 통해 데이터를 모델 인스턴스로 저장
-    #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ApplyAPIView(APIView):
     def get(self, request):
@@ -87,3 +69,45 @@ class ApplyDetail(APIView):
         apply = self.get_object(pk)
         apply.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class SortAPIView(APIView):
+    def get(self, request):
+        try:
+            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+                params = request.GET
+                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+                applys = Apply.objects.filter(**params)
+            else: # 쿼리 없을 시, 전체 데이터 요청
+                sorts = Sort.objects.all()
+            serializer = SortSerializer(sorts, many=True)
+            return Response(serializer.data)
+        except ValidationError as err:
+                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+    
+class SortDetail(APIView):
+    def get_object(self, pk):
+        try:
+            return Sort.objects.get(pk=pk)
+        except Apply.DoesNotExist:
+            raise Http404
+    
+    # Sort의 detail 보기
+    def get(self, request, pk, format=None):
+        sort = self.get_object(pk)
+        serializer = SortSerializer(sort)
+        return Response(serializer.data)
+
+    # Sort 수정하기는 형평성 우려로 허용되지 않음
+
+    # Sort 삭제하기
+    def delete(self, request, pk, format=None):
+        apply = self.get_object(pk)
+        apply.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+# sort_apply_data 명령을 실행
+class SortApplyDataView(APIView):
+    def post(self, request, format=None):
+        call_command('sort_apply')
+        return Response({'message': 'Apply data sorted successfully!'})

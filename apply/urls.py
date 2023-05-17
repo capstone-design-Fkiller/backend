@@ -5,7 +5,10 @@ from apply import views
 urlpatterns = [
     path('apply/', views.ApplyAPIView.as_view()),
     path('apply/<int:pk>', views.ApplyDetail.as_view()),
-    path('priority1/', views.PriorityAPIView.as_view()),
+    path('sort/', views.SortAPIView.as_view()),
+    path('sort/<int:pk>', views.SortDetail.as_view()),
+    path('sort/sort_apply/', views.SortApplyDataView.as_view())
+    #path('priority1/', views.PriorityAPIView.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
