@@ -6,9 +6,9 @@ from locker.models import Building
 
 class Apply(models.Model): #학생이 신청할 때 폼이다.
     id = models.BigAutoField(primary_key=True)
-    major = models.ForeignKey(Major, related_name="apply", on_delete=models.PROTECT, db_column="major") # 학과의 아이디를 가져올 것. # 신청은 삭제가 될 수 있다
-    user = models.ForeignKey(User, related_name="apply", on_delete=models.PROTECT, db_column="user") # 유저 아이디를 가져올 것.
-    building_id = models.ForeignKey(Building, related_name="apply", on_delete=models.PROTECT, db_column="building_id")
+    major = models.ForeignKey(Major, related_name="apply", on_delete=models.CASCADE, db_column="major") # 학과의 아이디를 가져올 것. # 신청은 삭제가 될 수 있다
+    user = models.ForeignKey(User, related_name="apply", on_delete=models.CASCADE, db_column="user") # 유저 아이디를 가져올 것.
+    building_id = models.ForeignKey(Building, related_name="apply", on_delete=models.CASCADE, db_column="building_id")
     priority_1_answer = models.JSONField(null=True, blank=True) # 모두 null 인 경우 선착순 배정
     priority_2_answer = models.JSONField(null=True, blank=True)
     priority_3_answer = models.JSONField(null=True, blank=True)
@@ -21,7 +21,8 @@ class Apply(models.Model): #학생이 신청할 때 폼이다.
         return self.id
 
 class Sort(models.Model):
-    priority = models.PositiveIntegerField(primary_key=True)
+    id = models.BigAutoField(primary_key=True)
+    priority = models.PositiveIntegerField()
     apply = models.ForeignKey(Apply, related_name='sort', on_delete=models.CASCADE, db_column="apply")
     major = models.ForeignKey(Major, related_name='sort', on_delete=models.CASCADE, db_column="major", null=True, default=None)
     user = models.ForeignKey(User, related_name='sort', on_delete=models.CASCADE, db_column="user", null=True, default=None)
@@ -37,6 +38,10 @@ class Sort(models.Model):
 
     def __str__(self):
         return str(self.priority)
+    
+    @classmethod
+    def get_table_name(cls, major_name):
+        return f"{major_name}_sort"
 
 # class Priority1(models.Model): #애는 하나의 유저당 하나씩 만들어져야 한다. 손명근한테 우리 학과 질문, 그에 대한 답변 , 123필요 없다. 한 개만 있으면 된다. first_criteria, first_answer
 #     id = models.BigAutoField(primary_key=True)
