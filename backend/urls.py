@@ -32,12 +32,6 @@ schema_view = get_schema_view(
     permission_classes=[],
 )
 
-# http://127.0.0.1/
-# http://127.0.0.1/app/
-
-# http://127.0.0.1/create/
-# http://127.0.0.1/read/1/
-
 urlpatterns = [
     path('docs/', include_docs_urls(title='API 문서')),
     re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
@@ -47,5 +41,6 @@ urlpatterns = [
     path('', include('user.urls')),
     path('', include('major.urls')),
     path('', include('locker.urls')),
-    path('', include('apply.urls'))
+    path('', include('apply.urls')),
+    path('', include('alert.urls'))
 ]
