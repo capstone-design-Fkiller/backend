@@ -3,10 +3,9 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
-from alert.serializers import AlertSerializer
 
-from apply.models import Apply, Priority1, Priority2, Priority3
-from apply.serializers import ApplySerializer
+from alert.models import Alert  
+from alert.serializers import AlertSerializer
 
 class AlertView(APIView):
     def get(self, request):
@@ -14,9 +13,9 @@ class AlertView(APIView):
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
                 params = request.GET
                 params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
-                applys = Apply.objects.filter(**params)
+                applys = Alert.objects.filter(**params)
             else: # 쿼리 없을 시, 전체 데이터 요청
-                applys = Apply.objects.all()
+                applys = Alert.objects.all()
             serializer = AlertSerializer(applys, many=True)
             return Response(serializer.data)
         except ValidationError as err:
@@ -25,46 +24,34 @@ class AlertView(APIView):
     def post(self, request):
         serializer = AlertSerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
-            apply = serializer.save()
-            priority_1_answer = serializer.validated_data.get("priority_1_answer")
-            priority_2_answer = serializer.validated_data.get("priority_2_answer")
-            priority_3_answer = serializer.validated_data.get("priority_3_answer")
-            if priority_1_answer:
-                priority1 = Priority1.objects.create(question=serializer.validated_data['major'], answer=apply)
-                priority1.save()
-            if priority_2_answer:
-                priority2 = Priority2.objects.create(question=serializer.validated_data['major'], answer=apply)
-                priority2.save()
-            if priority_3_answer:
-                priority3 = Priority3.objects.create(question=serializer.validated_data['major'], answer=apply)
-                priority3.save()
+            alert = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class AlertDetail(APIView):
     def get_object(self, pk):
         try:
-            return Apply.objects.get(pk=pk)
-        except Apply.DoesNotExist:
+            return Alert.objects.get(pk=pk)
+        except Alert.DoesNotExist:
             raise Http404
     
-    # Apply의 detail 보기
+    # alert의 detail 보기
     def get(self, request, pk, format=None):
-        apply = self.get_object(pk)
-        serializer = ApplySerializer(apply)
+        alert = self.get_object(pk)
+        serializer = AlertSerializer(alert)
         return Response(serializer.data)
 
-    # Apply 수정하기
+    # alert 수정하기
     def put(self, request, pk, format=None):
-        apply = self.get_object(pk)
-        serializer = ApplySerializer(apply, data=request.data) 
+        alert = self.get_object(pk)
+        serializer = AlertSerializer(alert, data=request.data) 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # Apply 삭제하기
+    # alert 삭제하기
     def delete(self, request, pk, format=None):
-        apply = self.get_object(pk)
-        apply.delete()
+        alert = self.get_object(pk)
+        Alert.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)

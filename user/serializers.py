@@ -2,7 +2,7 @@ from .models import User
 from rest_framework import serializers
 from major.models import Major
 from dj_rest_auth.registration.serializers import RegisterSerializer
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, PasswordField
 
 class RegistrationSerializer(RegisterSerializer):
     id = serializers.CharField(required=True)
@@ -11,7 +11,7 @@ class RegistrationSerializer(RegisterSerializer):
     password2 = serializers.CharField(write_only=True)
     # password1 = serializers.CharField(write_only=True, style={'input_type': 'password', 'autocomplete': 'new-password'}) #비밀번호 필드 형식으로 바뀌게 됨!
     # password2 = serializers.CharField(write_only=True, style={'input_type': 'password', 'autocomplete': 'new-password'})
-    name = serializers.CharField(max_length=50, default="")
+    name = serializers.CharField(max_length=50, required=True)
     is_usermode = serializers.BooleanField(required=False, default=True)
 
     # username 필드와 email필드를 Serializer에서 제거
@@ -58,9 +58,11 @@ class RegistrationSerializer(RegisterSerializer):
 
 # 로그인 시리얼라이저
 class LoginSerializer(TokenObtainPairSerializer):
+    id = serializers.IntegerField(required=True)
     major = serializers.PrimaryKeyRelatedField(allow_null=True, required=False, queryset=Major.objects.all())
     name = serializers.CharField(allow_blank=True, required=False, max_length=50, default="")
     is_usermode = serializers.BooleanField(required=False, default=True)
+    # password = PasswordField(default="qwer1234!")
 
     @classmethod
     def get_token(cls, user):

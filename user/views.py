@@ -4,6 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from django.contrib.auth import authenticate, get_user_model
 from django.http import Http404
 import jwt
@@ -16,48 +17,54 @@ from .serializers import RegistrationSerializer
 from .serializers import LoginSerializer
 from rest_framework import serializers
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 class RegistrationView(RegisterView):
     serializer_class = RegistrationSerializer
-
+    
+    @swagger_auto_schema(tags=['회원가입'], request_body=RegistrationSerializer, responses={200: 'Success'})
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
 
-        # 유저 정보 확인
+    # 유저 정보 확인
+    @swagger_auto_schema(tags=['로그인 : 유저 정보를 가져옵니다.'], operation_description="토큰 확인 후 유저 정보를 리턴합니다.", manual_parameters=[], responses={200: 'Success'})
     def get(self, request):
         try:
             # access token을 decode 해서 유저 id 추출 => 유저 식별
             access_token = request.COOKIES['access_token']
             payload = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
-            pk = payload.get('id')
+            pk = payload.get('user_id')
             user = get_object_or_404(User, pk=pk)
             serializer = UserSerializer(instance=user)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except(jwt.exceptions.ExpiredSignatureError):
-            # 토큰 만료 시 토큰 갱신
-            data = {'refresh_token': request.COOKIES.get('refresh_token', None)}
-            serializer = self.get_serializer(data=data)
+            # 엑세스 토큰 만료 시 토큰 갱신, 리프레쉬 토큰 만료 시 Token Error 전송
+            refresh_token = request.COOKIES.get('refresh_token', None)
+            data = {'refresh': refresh_token}
+            serializer = TokenRefreshSerializer(data=data)
+
             if serializer.is_valid(raise_exception=True):
-                access_token = serializer.validated_data.get('access_token', None)
-                refresh_token = serializer.validated_data.get('refresh_token', None)
+                access_token = serializer.validated_data.get('access', None)
                 payload = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
-                pk = payload.get('id')
+                pk = payload.get('user_id')
                 user = get_object_or_404(User, pk=pk)
                 serializer = UserSerializer(instance=user)
-                res = Response(serializer.data, status=status.HTTP_200_OK)
-                res.set_cookie('access_token', access_token)
-                res.set_cookie('refresh_token', refresh_token)
-                return res
-            raise jwt.exceptions.InvalidTokenError
-
-        except(jwt.exceptions.InvalidTokenError):
-            # 사용 불가능한 토큰일 때
-            return Response("Token is Invalid",status=status.HTTP_400_BAD_REQUEST)
+                response = Response(serializer.data, status=status.HTTP_200_OK)
+                response.set_cookie('access_token', access_token)
+                response.set_cookie('refresh_token', refresh_token)
+                return response
         except KeyError as err:
-                return Response({'message': f'There is no {err}, Please login again'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'There is no {err}, Please login again'}, status=status.HTTP_401_UNAUTHORIZED)
 
-    
+    @swagger_auto_schema(tags=['로그인'], request_body=openapi.Schema( type=openapi.TYPE_OBJECT, properties={ 
+        'id': openapi.Schema(type=openapi.TYPE_INTEGER, default=201801910),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, default='qwer1234!'),
+        }, required=['id', 'password'],), responses={200: 'Success'})
     def post(self, request):
         id = request.data['id']
         password = request.data['password']
@@ -65,7 +72,7 @@ class LoginView(TokenObtainPairView):
         user = authenticate(request, id=id, password=password)
         
         if not user:
-                raise serializers.ValidationError('the user is not exist or Invalid credentials')
+            raise serializers.ValidationError('the user is not exist or Invalid credentials')
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid(raise_exception=True):
             refresh_token = serializer.validated_data.get('refresh_token')
@@ -73,8 +80,8 @@ class LoginView(TokenObtainPairView):
 
             response_data = {
                     'message':  "login success",
-                    # 'refresh_token': str(refresh_token),
-                    # 'access_token': str(access_token),
+                    'refresh_token': str(refresh_token),
+                    'access_token': str(access_token),
             }   
             response = Response(response_data, status=status.HTTP_200_OK)
             
@@ -89,16 +96,23 @@ class LoginView(TokenObtainPairView):
 
 class LogoutView(APIView):    
     # 로그아웃
+    @swagger_auto_schema(tags=['로그아웃'], operation_description="쿠키에서 토큰을 삭제합니다.", manual_parameters=[], responses={200: 'Success'})
     def get(self, request):
         # 쿠키에 저장된 토큰 삭제 => 로그아웃 처리
-        response = Response({
-            "message": "Logout success"
-            }, status=status.HTTP_202_ACCEPTED)
-        response.delete_cookie("access_token")
-        response.delete_cookie("refresh_token")
-        return response
+        try:
+            response = Response({
+                "message": "logout success"
+                }, status=status.HTTP_202_ACCEPTED)
+            response.delete_cookie("access_token")
+            response.delete_cookie("refresh_token")
+            return response
+        except ValidationError as err:
+            return Response({'message': f'{err}, GET LOGOUT FAILED'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserAPIView(APIView):
+    id = openapi.Parameter('id', openapi.IN_QUERY, description='유저 id', required=False, default=201801910, type=openapi.TYPE_INTEGER)
+    major = openapi.Parameter('major', openapi.IN_QUERY, description='major query', required=False, default=17, type=openapi.TYPE_INTEGER)
+    @swagger_auto_schema(tags=['유저 : 쿼리 유저 정보를 가져옵니다.'], manual_parameters=[id, major], responses={200: 'Success'})
     def get(self, request, **kwargs):
         try:
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
@@ -111,7 +125,7 @@ class UserAPIView(APIView):
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
         except ValidationError as err:
-                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{err} GET_USER FAILED'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         users = User.objects.all()
@@ -126,6 +140,9 @@ class UserDetail(APIView):
             raise Http404
     
     # User의 detail 보기
+
+    getUserDetail = openapi.Parameter('id', openapi.IN_PATH, description='유저 id', required=True, default=201801910, type=openapi.TYPE_INTEGER)
+    @swagger_auto_schema(tags=['유저 : 개별 유저 정보를 가져옵니다.'], manual_parameters=[getUserDetail], responses={200: 'Success'})
     def get(self, request, pk, format=None, **kwargs):
         # filteredUser = User.objects.filter(**kwargs)
 
@@ -135,6 +152,8 @@ class UserDetail(APIView):
         return Response(serializer.data)
 
     # User 수정하기
+    putUserDetail = openapi.Parameter('id', openapi.IN_PATH, description='유저 id', required=True, default=201801910, type=openapi.TYPE_INTEGER)
+    @swagger_auto_schema(tags=['유저 : 개별 유저 정보를 수정합니다.'], manual_parameters=[putUserDetail], responses={200: 'Success'})
     def put(self, request, pk, format=None):
         user = self.get_object(pk)
         serializer = UserSerializer(user, data=request.data) 
