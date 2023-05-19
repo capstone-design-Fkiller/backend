@@ -66,32 +66,33 @@ class LoginView(TokenObtainPairView):
             'password': openapi.Schema(type=openapi.TYPE_STRING, default='qwer1234!'),
         }, required=['id', 'password'],), responses={200: 'Success'})
     def post(self, request):
-        id = request.data['id']
-        password = request.data['password']
+        try:
+            id = request.data['id']
+            password = request.data['password']
 
-        user = authenticate(request, id=id, password=password)
-        
-        if not user:
-            raise serializers.ValidationError('the user is not exist or Invalid credentials')
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            refresh_token = serializer.validated_data.get('refresh_token')
-            access_token = serializer.validated_data.get('access_token')
-
-            response_data = {
-                    'message':  "login success",
-                    'refresh_token': str(refresh_token),
-                    'access_token': str(access_token),
-            }   
-            response = Response(response_data, status=status.HTTP_200_OK)
+            user = authenticate(request, id=id, password=password)
             
-            response.set_cookie("refresh_token", refresh_token, httponly=True)
-            response.set_cookie("access_token", access_token, httponly=True)
+            if not user:
+                raise serializers.ValidationError('존재하지 않는 유저입니다.')
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                refresh_token = serializer.validated_data.get('refresh_token')
+                access_token = serializer.validated_data.get('access_token')
 
-            return response
-        else: # 그 외
+                response_data = {
+                        'message':  "login success",
+                        'refresh_token': str(refresh_token),
+                        'access_token': str(access_token),
+                }   
+                response = Response(response_data, status=status.HTTP_200_OK)
+                
+                response.set_cookie("refresh_token", refresh_token, httponly=True)
+                response.set_cookie("access_token", access_token, httponly=True)
+
+                return response
+        except Exception as e:
             return Response(
-                {"message": "로그인에 실패하였습니다"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
             )
 
 class LogoutView(APIView):    
@@ -107,7 +108,7 @@ class LogoutView(APIView):
             response.delete_cookie("refresh_token")
             return response
         except ValidationError as err:
-            return Response({'message': f'{err}, GET LOGOUT FAILED'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': f'{err}, 로그아웃 실패'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserAPIView(APIView):
     id = openapi.Parameter('id', openapi.IN_QUERY, description='유저 id', required=False, default=201801910, type=openapi.TYPE_INTEGER)
@@ -125,7 +126,7 @@ class UserAPIView(APIView):
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
         except ValidationError as err:
-                return Response({'message': f'{err} GET_USER FAILED'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{err} 유저 정보를 가져오지 못했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         users = User.objects.all()
@@ -140,15 +141,11 @@ class UserDetail(APIView):
             raise Http404
     
     # User의 detail 보기
-
     getUserDetail = openapi.Parameter('id', openapi.IN_PATH, description='유저 id', required=True, default=201801910, type=openapi.TYPE_INTEGER)
     @swagger_auto_schema(tags=['유저 : 개별 유저 정보를 가져옵니다.'], manual_parameters=[getUserDetail], responses={200: 'Success'})
     def get(self, request, pk, format=None, **kwargs):
-        # filteredUser = User.objects.filter(**kwargs)
-
         user = self.get_object(pk)
         serializer = UserSerializer(user)
-        # serializer = UserSerializer(filteredUser)
         return Response(serializer.data)
 
     # User 수정하기

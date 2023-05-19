@@ -10,3 +10,6 @@ class Alert(models.Model):
     sender = models.ForeignKey(User, related_name="alert_sender", on_delete=models.PROTECT, db_column="sender")
     receiver = models.ForeignKey(User, related_name="alert_receiver", on_delete=models.PROTECT, db_column="receiver")
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return str(self.id)

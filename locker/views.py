@@ -1,5 +1,5 @@
 from django.forms import ValidationError
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
@@ -7,7 +7,10 @@ from django.http import Http404
 from locker.models import Locker
 from locker.serializers import LockerSerializer, LockerPostSerializer
 
-class LockerAPIView(APIView):
+class LockerAPIView(generics.ListCreateAPIView):
+    queryset = lockers = Locker.objects.all()
+    serializer_class = LockerSerializer
+
     def get(self, request, **kwargs):
         try:
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
@@ -29,7 +32,9 @@ class LockerAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class LockerDetail(APIView):
+class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = LockerSerializer
+
     def get_object(self, pk):
         try:
             return Locker.objects.get(pk=pk)

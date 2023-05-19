@@ -6,29 +6,40 @@ from django.http import Http404
 
 from alert.models import Alert  
 from alert.serializers import AlertSerializer
+# from rest_framework import viewsets
+from rest_framework import generics
 
-class AlertView(APIView):
-    def get(self, request):
-        try:
-            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
-                params = request.GET
-                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
-                applys = Alert.objects.filter(**params)
-            else: # 쿼리 없을 시, 전체 데이터 요청
-                applys = Alert.objects.all()
-            serializer = AlertSerializer(applys, many=True)
-            return Response(serializer.data)
-        except ValidationError as err:
-                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+
+class AlertView(generics.ListCreateAPIView):
+    queryset = Alert.objects.all()
+    serializer_class = AlertSerializer
+    # serializer_class = RegistrationSerializer
+
+    # # 내 알림을 받으려면, 
+    # def get(self, request):
+    #     try:
+    #         if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+    #             params = request.GET
+    #             params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+    #             alerts = Alert.objects.filter(**params)
+    #         else: # 쿼리 없을 시, 전체 데이터 요청
+    #             alerts = Alert.objects.all()
+    #         serializer = AlertSerializer(alerts, many=True)
+    #         return Response(serializer.data)
+    #     except ValidationError as err:
+    #             return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
-    def post(self, request):
-        serializer = AlertSerializer(data = request.data) # json을 변환하게 된다.
-        if serializer.is_valid():
-            alert = serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # # 알림 전송 --- 관리자가 사용자를 지정할 때 receiver = 17
+    # def post(self, request):
+    #     serializer = AlertSerializer(data = request.data) # json을 변환하게 된다.
+    #     if serializer.is_valid():
+    #         alert = serializer.save()
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class AlertDetail(APIView):
+class AlertDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = AlertSerializer
+
     def get_object(self, pk):
         try:
             return Alert.objects.get(pk=pk)
