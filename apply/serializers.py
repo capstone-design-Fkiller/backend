@@ -13,7 +13,7 @@ from rest_framework import serializers
 
 class ApplySerializer(serializers.ModelSerializer):
     # priority_1 = PrioritySerializer() # question answer를 담을 수 있도록
-    
+
     class Meta:
         model = Apply
         fields = '__all__'
@@ -26,9 +26,14 @@ class ApplyPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class SortSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Apply
-#         fields = '__all__'
+class SortSerializer(serializers.ModelSerializer):
+    rank = serializers.SerializerMethodField()
+
+    def get_rank(self, obj):
+        return obj.rank
+
+    class Meta:
+        model = Apply
+        fields = '__all__'
         
 
