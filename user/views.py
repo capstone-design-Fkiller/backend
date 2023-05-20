@@ -1,77 +1,119 @@
 from django.forms import ValidationError
-from rest_framework import status, generics
+from django.shortcuts import get_object_or_404
+from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.backends import ModelBackend
-from dj_rest_auth.views import LoginView
+from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from django.contrib.auth import authenticate, get_user_model
 from django.http import Http404
-
+import jwt
 from user.models import User
-from user.serializers import UserPostSerializer, UserSerializer
+from user.serializers import UserSerializer
+from backend.settings import SECRET_KEY
 
 from dj_rest_auth.registration.views import RegisterView
-from .serializers import UserRegistrationSerializer
+from .serializers import RegistrationSerializer
 from .serializers import LoginSerializer
 from rest_framework import serializers
 
-class MyUserRegistrationView(RegisterView):
-    serializer_class = UserRegistrationSerializer
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
 
-    # # 회원가입 시에 토큰 보내줄 때
-    # def post(self, request):
-    #     serializer = self.get_serializer(data=request.data)
-    #     if serializer.is_valid(raise_exception=True):
-    #         user = serializer.save(request)
-    #         refresh_token = RefreshToken.for_user(user)
-
-    #         response_data = {
-    #             "refresh_token": str(refresh_token),
-    #             "access_token": str(refresh_token.access_token),
-    #             "user": UserSerializer(user).data
-    #         }
-    #         return Response(response_data, status=status.HTTP_201_CREATED)
-    #     else:
-    #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class RegistrationView(RegisterView):
+    serializer_class = RegistrationSerializer
+    
+    @swagger_auto_schema(tags=['회원가입'], request_body=RegistrationSerializer, responses={200: 'Success'})
+    def post(self, request, *args, **kwargs):
+        return super().post(request, *args, **kwargs)
 
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
-    
-    def post(self, request):
-        serializer = self.get_serializer(data=request.data)
 
-        if serializer.is_valid(raise_exception=True):
+    # 유저 정보 확인
+    @swagger_auto_schema(tags=['로그인 : 유저 정보를 가져옵니다.'], operation_description="토큰 확인 후 유저 정보를 리턴합니다.", manual_parameters=[], responses={200: 'Success'})
+    def get(self, request):
+        try:
+            # access token을 decode 해서 유저 id 추출 => 유저 식별
+            access_token = request.COOKIES['access_token']
+            payload = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+            pk = payload.get('user_id')
+            user = get_object_or_404(User, pk=pk)
+            serializer = UserSerializer(instance=user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except(jwt.exceptions.ExpiredSignatureError):
+            # 엑세스 토큰 만료 시 토큰 갱신, 리프레쉬 토큰 만료 시 Token Error 전송
+            refresh_token = request.COOKIES.get('refresh_token', None)
+            data = {'refresh': refresh_token}
+            serializer = TokenRefreshSerializer(data=data)
+
+            if serializer.is_valid(raise_exception=True):
+                access_token = serializer.validated_data.get('access', None)
+                payload = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
+                pk = payload.get('user_id')
+                user = get_object_or_404(User, pk=pk)
+                serializer = UserSerializer(instance=user)
+                response = Response(serializer.data, status=status.HTTP_200_OK)
+                response.set_cookie('access_token', access_token)
+                response.set_cookie('refresh_token', refresh_token)
+                return response
+        except KeyError as err:
+                return Response({'message': f'There is no {err}, Please login again'}, status=status.HTTP_401_UNAUTHORIZED)
+
+    @swagger_auto_schema(tags=['로그인'], request_body=openapi.Schema( type=openapi.TYPE_OBJECT, properties={ 
+        'id': openapi.Schema(type=openapi.TYPE_INTEGER, default=201801910),
+            'password': openapi.Schema(type=openapi.TYPE_STRING, default='qwer1234!'),
+        }, required=['id', 'password'],), responses={200: 'Success'})
+    def post(self, request):
+        try:
             id = request.data['id']
             password = request.data['password']
 
-            user = authenticate(request, username=id, password=password)
-            # user = User.objects.filter(id=id).first() # 둘 중 하나
-            if not user:
-                raise serializers.ValidationError('Invalid credentials')
-            user = UserSerializer(user)
-            refresh_token = serializer.validated_data.get('refresh_token') # _token을 뒤에 붙일지 고민하자.
-            access_token = serializer.validated_data.get('access_token')
-
-            response_data = {
-                    'user': user.data,
-                    'refresh_token': str(refresh_token),
-                    'access_token': str(access_token),
-            }
-            response = Response(response_data, status=status.HTTP_200_OK)
+            user = authenticate(request, id=id, password=password)
             
-            response.set_cookie("refresh_token", refresh_token, httponly=True) # 혹시 몰라 쿠키에도 준다.
-            response.set_cookie("access_token", access_token, httponly=True)
+            if not user:
+                raise serializers.ValidationError('존재하지 않는 유저입니다.')
+            serializer = self.get_serializer(data=request.data)
+            if serializer.is_valid(raise_exception=True):
+                refresh_token = serializer.validated_data.get('refresh_token')
+                access_token = serializer.validated_data.get('access_token')
 
-            return response
-        else: # 그 외
+                response_data = {
+                        'message':  "login success",
+                        'refresh_token': str(refresh_token),
+                        'access_token': str(access_token),
+                }   
+                response = Response(response_data, status=status.HTTP_200_OK)
+                
+                response.set_cookie("refresh_token", refresh_token, httponly=True)
+                response.set_cookie("access_token", access_token, httponly=True)
+
+                return response
+        except Exception as e:
             return Response(
-                {"message": "로그인에 실패하였습니다"}, status=status.HTTP_400_BAD_REQUEST
+                {"message": f"{e}"}, status=status.HTTP_400_BAD_REQUEST
             )
-    
+
+class LogoutView(APIView):    
+    # 로그아웃
+    @swagger_auto_schema(tags=['로그아웃'], operation_description="쿠키에서 토큰을 삭제합니다.", manual_parameters=[], responses={200: 'Success'})
+    def get(self, request):
+        # 쿠키에 저장된 토큰 삭제 => 로그아웃 처리
+        try:
+            response = Response({
+                "message": "logout success"
+                }, status=status.HTTP_202_ACCEPTED)
+            response.delete_cookie("access_token")
+            response.delete_cookie("refresh_token")
+            return response
+        except ValidationError as err:
+            return Response({'message': f'{err}, 로그아웃 실패'}, status=status.HTTP_400_BAD_REQUEST)
 
 class UserAPIView(APIView):
+    id = openapi.Parameter('id', openapi.IN_QUERY, description='유저 id', required=False, default=201801910, type=openapi.TYPE_INTEGER)
+    major = openapi.Parameter('major', openapi.IN_QUERY, description='major query', required=False, default=17, type=openapi.TYPE_INTEGER)
+    @swagger_auto_schema(tags=['유저 : 쿼리 유저 정보를 가져옵니다.'], manual_parameters=[id, major], responses={200: 'Success'})
     def get(self, request, **kwargs):
         try:
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
@@ -84,7 +126,7 @@ class UserAPIView(APIView):
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data)
         except ValidationError as err:
-                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{err} 유저 정보를 가져오지 못했습니다.'}, status=status.HTTP_400_BAD_REQUEST)
     
     def delete(self, request):
         users = User.objects.all()
@@ -99,15 +141,16 @@ class UserDetail(APIView):
             raise Http404
     
     # User의 detail 보기
+    getUserDetail = openapi.Parameter('id', openapi.IN_PATH, description='유저 id', required=True, default=201801910, type=openapi.TYPE_INTEGER)
+    @swagger_auto_schema(tags=['유저 : 개별 유저 정보를 가져옵니다.'], manual_parameters=[getUserDetail], responses={200: 'Success'})
     def get(self, request, pk, format=None, **kwargs):
-        # filteredUser = User.objects.filter(**kwargs)
-
         user = self.get_object(pk)
         serializer = UserSerializer(user)
-        # serializer = UserSerializer(filteredUser)
         return Response(serializer.data)
 
     # User 수정하기
+    putUserDetail = openapi.Parameter('id', openapi.IN_PATH, description='유저 id', required=True, default=201801910, type=openapi.TYPE_INTEGER)
+    @swagger_auto_schema(tags=['유저 : 개별 유저 정보를 수정합니다.'], manual_parameters=[putUserDetail], responses={200: 'Success'})
     def put(self, request, pk, format=None):
         user = self.get_object(pk)
         serializer = UserSerializer(user, data=request.data) 
@@ -121,33 +164,3 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
-
-# 로그인뷰 다른 방식
-# class LoginView(generics.GenericAPIView):
-#     serializer_class = LoginSerializer
-
-#     def post(self, request, *args, **kwargs):
-#         serializer = self.get_serializer(data=request.data)
-#         serializer.is_valid(raise_exception=True)
-
-#         id = serializer.validated_data['id']
-#         password = serializer.validated_data['password']
-
-#         user = authenticate(request, id=id, password=password)
-
-#         if not user:
-#             return Response({'detail': 'Invalid credentials'}, status=status.HTTP_401_UNAUTHORIZED)
-        
-
-#         refresh = RefreshToken.for_user(user)
-#         user = UserSerializer(user) 
-#         # response.set_cookie("refresh_token", refresh_token, httponly=True)
-#         # response.set_cookie("access_token", access_token, httponly=True)
-
-#         return Response({
-#             'user': user.data,
-#             'refresh': str(refresh),
-#             'access': str(refresh.access_token)
-#         })

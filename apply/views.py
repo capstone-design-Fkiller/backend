@@ -1,13 +1,14 @@
 from django.forms import ValidationError
 from rest_framework import status
 from rest_framework.views import APIView
+from rest_framework import generics
 from rest_framework.response import Response
 from django.http import Http404
 
 from apply.models import Apply, Priority1, Priority2, Priority3
 from apply.serializers import ApplySerializer, PrioritySerializer
 
-class PriorityAPIView(APIView):
+class PriorityAPIView(generics.ListAPIView):
     def get(self, request):
         try:
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
@@ -27,7 +28,10 @@ class PriorityAPIView(APIView):
     #     serializer.save()  # serializer를 통해 데이터를 모델 인스턴스로 저장
     #     return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-class ApplyAPIView(APIView):
+class ApplyAPIView(generics.ListCreateAPIView):
+    serializer_class = ApplySerializer
+    queryset = Apply.objects.all()
+    
     def get(self, request):
         try:
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
@@ -60,7 +64,9 @@ class ApplyAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class ApplyDetail(APIView):
+class ApplyDetail(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = ApplySerializer
+
     def get_object(self, pk):
         try:
             return Apply.objects.get(pk=pk)
