@@ -1,8 +1,8 @@
 my_settings.py
 
 # migrations files without __init__.py gitignore
-**/migrations/*
-!**migrations/__init__.py
+*/migrations/**.py
+!*/migrations/__init__.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

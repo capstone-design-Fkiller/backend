@@ -106,6 +106,12 @@ CORS_ORIGIN_WHITELIST = [
     'https://localhost:8001',
 ]
 
+CORS_ALLOW_HEADERS = [
+    'Authorization',  # 허용할 헤더 필드 추가
+    'access_token',  # 허용할 헤더 필드 추가
+    'refresh_token',  # 허용할 헤더 필드 추가
+]
+
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
