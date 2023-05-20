@@ -38,7 +38,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         db_table = "user"
     
     def __str__(self):
-        return self.id
+        return self.name
     
 
 

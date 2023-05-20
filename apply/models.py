@@ -20,29 +20,6 @@ class Apply(models.Model): #학생이 신청할 때 폼이다.
     def __str__(self):
         return self.id
 
-class Sort(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    priority = models.PositiveIntegerField()
-    apply = models.ForeignKey(Apply, related_name='sort', on_delete=models.CASCADE, db_column="apply")
-    major = models.ForeignKey(Major, related_name='sort', on_delete=models.CASCADE, db_column="major", null=True, default=None)
-    user = models.ForeignKey(User, related_name='sort', on_delete=models.CASCADE, db_column="user", null=True, default=None)
-    building_id = models.ForeignKey(Building, related_name='sort', on_delete=models.CASCADE, db_column="building_id", null=True, default=None)
-    priority_1_answer = models.JSONField(null=True, blank=True)
-    priority_2_answer = models.JSONField(null=True, blank=True)
-    priority_3_answer = models.JSONField(null=True, blank=True)
-    created_at = models.DateTimeField(null=True, blank=True, default=None)
-
-    class Meta:
-        db_table = "sort"
-        ordering = ['priority']
-
-    def __str__(self):
-        return str(self.priority)
-    
-    @classmethod
-    def get_table_name(cls, major_name):
-        return f"{major_name}_sort"
-
 # class Priority1(models.Model): #애는 하나의 유저당 하나씩 만들어져야 한다. 손명근한테 우리 학과 질문, 그에 대한 답변 , 123필요 없다. 한 개만 있으면 된다. first_criteria, first_answer
 #     id = models.BigAutoField(primary_key=True)
 #     question = models.ForeignKey(Major, related_name="priority1", on_delete=models.PROTECT, db_column="priority1") #major의 자식으로 해서 first질문 받아 오도록

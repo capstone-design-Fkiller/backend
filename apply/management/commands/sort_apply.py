@@ -6,7 +6,7 @@ class Command(BaseCommand):
     help = 'Sort Apply data'
 
     def handle(self, *args, **options):
-        applies = Apply.objects.all().order_by(
+        applies = Apply.objects.filter().order_by(
             'major',
             '-priority_1_answer',
             '-priority_2_answer',

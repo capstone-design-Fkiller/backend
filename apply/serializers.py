@@ -1,5 +1,5 @@
 from major.models import Major
-from .models import Apply, Sort
+from .models import Apply
 from rest_framework import serializers
 
 
@@ -26,18 +26,9 @@ class ApplyPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class SortSerializer(serializers.ModelSerializer):
-    # priority_1 = PrioritySerializer() # question answer를 담을 수 있도록
-    
-    class Meta:
-        model = Sort
-        fields = '__all__'
-        
-class SortPostSerializer(serializers.ModelSerializer):
-    # priority_1 = PrioritySerializer() # question answer를 담을 수 있도록
-
-    class Meta:
-        model = Sort
-        fields = '__all__'
+# class SortSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Apply
+#         fields = '__all__'
         
 
