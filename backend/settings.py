@@ -14,6 +14,8 @@ from pathlib import Path
 import my_settings
 import pymysql
 from datetime import datetime, timedelta
+from corsheaders.defaults import default_headers
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -102,10 +104,9 @@ CORS_ORIGIN_WHITELIST = [
     'https://localhost:8001',
 ]
 
-CORS_ALLOW_HEADERS = [
-    'Authorization',  # 허용할 헤더 필드 추가
-    'access_token',  # 허용할 헤더 필드 추가
-    'refresh_token',  # 허용할 헤더 필드 추가
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'access_token', # 허용할 헤더 필드 추가
+    'refresh_token',
 ]
 
 ROOT_URLCONF = "backend.urls"
