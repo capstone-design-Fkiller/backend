@@ -1,7 +1,6 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from apply import views
-from apply.views import sort_apply_command_view
 
 urlpatterns = [
     path('apply/', views.ApplyAPIView.as_view()),

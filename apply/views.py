@@ -1,14 +1,9 @@
 from django.forms import ValidationError
 from rest_framework import status, generics
-from django.http import HttpResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 from django.core.management import call_command
-from django.db import connections
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import api_view
-from rest_framework.renderers import JSONRenderer
 from django.db.models.functions import RowNumber
 from django.db.models import Count, F, Window
 
@@ -71,7 +66,7 @@ class ApplyDetail(generics.RetrieveUpdateDestroyAPIView):
 class SortAPIView(generics.ListAPIView):
     queryset = Apply.objects.all()
     serializer_class = ApplySerializer
-    
+
     def get_object(self, pk):
         try:
             return Apply.objects.get(pk=pk)

@@ -18,7 +18,7 @@ class Apply(models.Model): #학생이 신청할 때 폼이다.
         db_table = "apply"
     
     def __str__(self):
-        return self.id
+        return str(self.id)
 
 # class Priority1(models.Model): #애는 하나의 유저당 하나씩 만들어져야 한다. 손명근한테 우리 학과 질문, 그에 대한 답변 , 123필요 없다. 한 개만 있으면 된다. first_criteria, first_answer
 #     id = models.BigAutoField(primary_key=True)

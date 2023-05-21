@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     "major",
     "apply",
     "locker",
-    #"sort",
+    "assign",
     "rest_framework",
     "drf_yasg",
     "rest_framework.authtoken",

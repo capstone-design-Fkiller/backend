@@ -48,5 +48,5 @@ urlpatterns = [
     path('', include('major.urls')),
     path('', include('locker.urls')),
     path('', include('apply.urls')),
-    #path('', include('sort.urls'))
+    path('', include('assign.urls'))
 ]

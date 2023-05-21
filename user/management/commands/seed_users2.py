@@ -20,7 +20,8 @@ class Command(BaseCommand):
             id = int(str(random.randint(2016, 2023)) + str(random.randint(10000, 99999)))
             password = 'qwer1234!'
             name = fake.name()
-            major = majors[random.randint(0, len(majors)-1)]
+            #major = majors[random.randint(0, len(majors)-1)]
+            major = majors[26-1] # 한교과로 assign 테스트
             is_adminable = False # 관리자 안 되게 허용
             is_usermode = True
             user = User(id=id, name=name, major=major)
