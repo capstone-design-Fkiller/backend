@@ -44,4 +44,5 @@ urlpatterns = [
     path('', include('apply.urls')),
     path('', include('alert.urls')),
     path('', include('notice.urls'))
+    path('', include('assign.urls'))
 ]

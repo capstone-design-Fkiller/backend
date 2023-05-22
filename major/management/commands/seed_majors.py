@@ -1,7 +1,8 @@
 from django.core.management.base import BaseCommand, CommandParser
 from django_seed import Seed
 from major.models import Major
-from itertools import cycle
+from datetime import datetime
+from major.models import Priority
 import info
 
 class Command(BaseCommand):
@@ -13,11 +14,11 @@ class Command(BaseCommand):
         for major in info.MAJORS :
             seeder.add_entity(Major, 1, {
                 'name': major,
-                'apply_start_date': None,
-                'apply_end_date': None,
-                'priority_first': None,
-                'priority_second': None,
-                'priority_third': None,
+                'apply_start_date': "2023-3-1",
+                'apply_end_date': "2023-6-20",
+                'priority_1': Priority.objects.filter(name="학생회비 납부여부").first(),
+                'priority_2': Priority.objects.filter(name="통학시간").first(),
+                'priority_3': None
             })
 
         seeder.execute()
