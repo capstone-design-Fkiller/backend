@@ -34,6 +34,7 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '.amazonaws.com',
     '15.165.146.217',
+    '127.0.0.1'
 ]
 
 
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
     "locker",
     "alert",
     "notice",
+    "assign",
     "rest_framework",
     "drf_yasg",
     "rest_framework.authtoken",
