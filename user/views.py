@@ -36,13 +36,18 @@ class LoginView(TokenObtainPairView):
     @swagger_auto_schema(tags=['로그인 : 유저 정보를 가져옵니다.'], operation_description="토큰 확인 후 유저 정보를 리턴합니다.", manual_parameters=[], responses={200: 'Success'})
     def get(self, request):
         try:
-            # print(request.COOKIES, "출력")
+            print(request.COOKIES, "쿠키 전부 출력")
             # access token을 decode 해서 유저 id 추출 => 유저 식별
-            # access_token = request.COOKIES['access_token']
+            access_token2 = request.COOKIES['access_token']
             # if not access_token:
             auth_header = request.COOKIES['Authorization']
             access_token = auth_header.split(' ')[1] if len(auth_header.split(' ')) > 1 else None
-            print(access_token, "")
+            print(access_token, "나눈 엑세스 토큰 출력")
+            print(access_token2, "엑세스 토큰2 출력")
+            if (access_token2 == access_token):
+                print("두개 같아!!")
+            else :
+                print("두개 달라!!")
             payload = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
             pk = payload.get('user_id')
             user = get_object_or_404(User, pk=pk)
