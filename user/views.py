@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
+from rest_framework.authentication import TokenAuthentication
 from django.contrib.auth import authenticate, get_user_model
 from django.http import Http404
 import jwt
@@ -29,13 +30,19 @@ class RegistrationView(RegisterView):
 
 class LoginView(TokenObtainPairView):
     serializer_class = LoginSerializer
+    authentication_classes = [TokenAuthentication]
 
     # 유저 정보 확인
     @swagger_auto_schema(tags=['로그인 : 유저 정보를 가져옵니다.'], operation_description="토큰 확인 후 유저 정보를 리턴합니다.", manual_parameters=[], responses={200: 'Success'})
     def get(self, request):
         try:
+            # print(request.COOKIES, "출력")
             # access token을 decode 해서 유저 id 추출 => 유저 식별
-            access_token = request.COOKIES['access_token']
+            # access_token = request.COOKIES['access_token']
+            # if not access_token:
+            auth_header = request.COOKIES['Authorization']
+            access_token = auth_header.split(' ')[1] if len(auth_header.split(' ')) > 1 else None
+            print(access_token, "")
             payload = jwt.decode(access_token, SECRET_KEY, algorithms=['HS256'])
             pk = payload.get('user_id')
             user = get_object_or_404(User, pk=pk)
@@ -86,7 +93,8 @@ class LoginView(TokenObtainPairView):
                 }   
                 response = Response(response_data, status=status.HTTP_200_OK)
                 
-                response.set_cookie("refresh_token", refresh_token, httponly=True)
+                # response.set_cookie("refresh_token", refresh_token, httponly=True)
+                response.set_cookie("Authorization", "Bearer " + str(access_token), httponly=True)
                 response.set_cookie("access_token", access_token, httponly=True)
 
                 return response
