@@ -13,6 +13,9 @@ from major.models import Major
 from apply.serializers import ApplySerializer, ApplyPostSerializer, SortSerializer
 
 class ApplyAPIView(generics.ListCreateAPIView):
+    queryset = Apply.objects.all()
+    serializer_class = ApplySerializer
+
     def get(self, request, **kwargs):
         try:
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
