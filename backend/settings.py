@@ -14,6 +14,8 @@ from pathlib import Path
 import my_settings
 import pymysql
 from datetime import datetime, timedelta
+from corsheaders.defaults import default_headers
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,7 +30,11 @@ SECRET_KEY = my_settings.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    '.amazonaws.com',
+    '15.165.146.217',
+    '127.0.0.1'
+]
 
 
 # Application definition
@@ -44,6 +50,9 @@ INSTALLED_APPS = [
     "major",
     "apply",
     "locker",
+    "alert",
+    "notice",
+    "assign",
     "rest_framework",
     "drf_yasg",
     "rest_framework.authtoken",
@@ -100,6 +109,11 @@ CORS_ORIGIN_WHITELIST = [
     'https://localhost:8001',
 ]
 
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'access_token', # 허용할 헤더 필드 추가
+    'refresh_token',
+]
+
 ROOT_URLCONF = "backend.urls"
 
 TEMPLATES = [
@@ -151,13 +165,26 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
+    'DEFAULT_PERMISSION_CLASSES': (
+    # 'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
+    # 'rest_framework.permissions.IsAdminUser', # 관리자만 접근
+    'rest_framework.permissions.AllowAny', # 누구나 접근
+    ),
 }
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
+    
     'USER_ID_FIELD': 'id',
     'USER_ID_CLAIM': 'user_id',
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+
 }
 
 
@@ -167,13 +194,13 @@ AUTH_USER_MODEL = 'user.User'
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = "ko-kr"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Asia/Seoul"
 
 USE_I18N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)

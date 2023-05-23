@@ -24,19 +24,13 @@ router = routers.DefaultRouter()
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="API 문서",
+        title="HUFS LOCKER API",
         default_version="v1",
-        description="API 문서입니다.",
+        description="HUFS LOCKER API 문서입니다.",
     ),
     public=True,
     permission_classes=[],
 )
-
-# http://127.0.0.1/
-# http://127.0.0.1/app/
-
-# http://127.0.0.1/create/
-# http://127.0.0.1/read/1/
 
 urlpatterns = [
     path('docs/', include_docs_urls(title='API 문서')),
@@ -47,5 +41,8 @@ urlpatterns = [
     path('', include('user.urls')),
     path('', include('major.urls')),
     path('', include('locker.urls')),
-    path('', include('apply.urls'))
+    path('', include('apply.urls')),
+    path('', include('alert.urls')),
+    path('', include('notice.urls')),
+    path('', include('assign.urls'))
 ]
