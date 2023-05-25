@@ -79,13 +79,14 @@ class SortAPIView(generics.ListAPIView):
     
     # Sort의 detail 보기
     def get(self, request, major, format=None):
+        # 학과에서 배정기준 정보들을 가져옴
         major = Major.objects.get(id=major)
         is_ascending_1 = major.priority_1.is_ascending if major.priority_1 else None
         is_ascending_2 = major.priority_2.is_ascending if major.priority_2 else None
         is_ascending_3 = major.priority_3.is_ascending if major.priority_3 else None
-
         base_rule =  "created_at" if major.is_baserule_FCFS else '?'
 
+        # 배정 기준에 다라 apply 정보 정렬
         if is_ascending_1 == None :
             sort = Apply.objects.filter(major=major).order_by(
                 base_rule
@@ -95,7 +96,7 @@ class SortAPIView(generics.ListAPIView):
                 ('priority_1_answer' if is_ascending_1 else '-priority_1_answer'),
                 base_rule
             )
-        elif is_ascending_3 == None:
+        elif is_ascending_3 == None :
             sort = Apply.objects.filter(major=major).order_by(
                 ('priority_1_answer' if is_ascending_1 else '-priority_1_answer'),
                 ('priority_2_answer' if is_ascending_2 else '-priority_2_answer'),
