@@ -42,10 +42,7 @@ class AssignAPIView(APIView):
         major = Major.objects.get(id=major)
 
         # 배정할 신청정보 리스트를 순회
-        for rank, apply_id in data.items():
-            rank = int(rank)
-            apply_id = int(apply_id)
-
+        for apply_id in assign_list:
             apply = Apply.objects.get(id=apply_id)
             building_id = apply.building_id
             user = apply.user
