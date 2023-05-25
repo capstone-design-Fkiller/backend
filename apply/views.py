@@ -101,10 +101,10 @@ class SortAPIView(generics.ListAPIView):
                 ('priority_2_answer' if is_ascending_2 else '-priority_2_answer'),
                 base_rule
             )
-            sort = sort.annotate(rank=Window(expression=RowNumber(), order_by=(
-                F('priority_1_answer').desc(),
-                F('priority_2_answer').desc(),
-                )))
+            # sort = sort.annotate(rank=Window(expression=RowNumber(), order_by=(
+            #     F('priority_1_answer').desc(),
+            #     F('priority_2_answer').desc(),
+            #     )))
         else :
             sort = Apply.objects.filter(major=major).order_by(
                 ('priority_1_answer' if is_ascending_1 else '-priority_1_answer'),
@@ -115,8 +115,8 @@ class SortAPIView(generics.ListAPIView):
 
         serializer = SortSerializer(sort, many=True).data
 
-        for index, data in enumerate(serializer):
-            data['rank'] = index + 1
+        # for index, data in enumerate(serializer):
+        #     data['rank'] = index + 1
 
         return Response(serializer)
 
