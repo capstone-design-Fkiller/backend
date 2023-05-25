@@ -83,7 +83,7 @@ class AssignAPIView(APIView):
                 unanssign_instance = Unassign.objects.create(user=user, apply=apply, major=major)
                 unanssign_instance.save()
 
-                print("debug : 탈락! 순위:", rank, "| 신청", apply_id, "| 이름", apply.user)
+                print("debug : 탈락!", "| 신청", apply_id, "| 이름", apply.user)
 
         serializer = AssignPostSerializer(assigned, many=True)
 

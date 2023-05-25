@@ -27,7 +27,7 @@ class ApplyPostSerializer(serializers.ModelSerializer):
 
 
 class SortSerializer(serializers.ModelSerializer):
-    rank = serializers.SerializerMethodField()
+    # rank = serializers.SerializerMethodField()
 
     def get_rank(self, obj):
         return obj.rank
