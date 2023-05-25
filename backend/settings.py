@@ -30,11 +30,7 @@ SECRET_KEY = my_settings.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [
-    '.amazonaws.com',
-    '15.165.146.217',
-    '127.0.0.1'
-]
+ALLOWED_HOSTS = [".amazonaws.com", "15.165.146.217", "127.0.0.1"]
 
 
 # Application definition
@@ -60,7 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "allauth",
     "allauth.account",
-    'corsheaders',
+    "corsheaders",
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     "django_seed",
@@ -77,41 +73,38 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-# CORS_ORIGIN_ALLOW_ALL = True # 모든 URL 허용
-CORS_ALLOW_CREDENTIALS = True # 쿠키 설정
-
 
 CORS_ORIGIN_WHITELIST = [
-    'http://127.0.0.1:3000',
-    'https://127.0.0.1:3000',
-    'http://127.0.0.1:5173',
-    'https://127.0.0.1:5173',
-    'http://127.0.0.1:5174',
-    'http://127.0.0.1:5713',
-    'https://127.0.0.1:5713',
-    'https://127.0.0.1:5174',
-    'http://127.0.0.1:5714',
-    'https://127.0.0.1:5714',
-    'http://127.0.0.1:8001',
-    'https://127.0.0.1:8001',
-    'http://localhost:3000',
-    'https://localhost:3000',
-    'http://localhost:5173',
-    'http://localhost:5173',
-    'https://localhost:5173',
-    'http://localhost:5174',
-    'http://localhost:5713',
-    'https://localhost:5713',
-    'https://localhost:5174',
-    'http://localhost:5714',
-    'https://localhost:5714',
-    'http://localhost:8001',
-    'https://localhost:8001',
+    "http://127.0.0.1:3000",
+    "https://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+    "https://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+    "http://127.0.0.1:5713",
+    "https://127.0.0.1:5713",
+    "https://127.0.0.1:5174",
+    "http://127.0.0.1:5714",
+    "https://127.0.0.1:5714",
+    "http://127.0.0.1:8001",
+    "https://127.0.0.1:8001",
+    "http://localhost:3000",
+    "https://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5173",
+    "https://localhost:5173",
+    "http://localhost:5174",
+    "http://localhost:5713",
+    "https://localhost:5713",
+    "https://localhost:5174",
+    "http://localhost:5714",
+    "https://localhost:5714",
+    "http://localhost:8001",
+    "https://localhost:8001",
 ]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'access_token', # 허용할 헤더 필드 추가
-    'refresh_token',
+    "access_token",  # 허용할 헤더 필드 추가
+    "refresh_token",
 ]
 
 ROOT_URLCONF = "backend.urls"
@@ -150,45 +143,48 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
-    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",},
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
+    },
 ]
-ACCOUNT_USER_MODEL_USERNAME_FIELD = 'id'
+ACCOUNT_USER_MODEL_USERNAME_FIELD = "id"
 ACCOUNT_USERNAME_REQUIRED = False
 
 REST_AUTH_REGISTER_SERIALIZERS = {
-    'REGISTER_SERIALIZER': 'user.serializers.MyUserRegistrationSerializer'
+    "REGISTER_SERIALIZER": "user.serializers.MyUserRegistrationSerializer"
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
     ],
-    'DEFAULT_PERMISSION_CLASSES': (
-    # 'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
-    # 'rest_framework.permissions.IsAdminUser', # 관리자만 접근
-    'rest_framework.permissions.AllowAny', # 누구나 접근
+    "DEFAULT_PERMISSION_CLASSES": (
+        # 'rest_framework.permissions.IsAuthenticated', # 인증된 사용자만 접근
+        # 'rest_framework.permissions.IsAdminUser', # 관리자만 접근
+        "rest_framework.permissions.AllowAny",  # 누구나 접근
     ),
 }
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    
-    'AUTH_HEADER_TYPES': ('Bearer',),
-    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',
-    
-    'USER_ID_FIELD': 'id',
-    'USER_ID_CLAIM': 'user_id',
-    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
-    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
-    'TOKEN_TYPE_CLAIM': 'token_type',
-
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "AUTH_HEADER_NAME": "HTTP_AUTHORIZATION",
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "user_id",
+    "USER_AUTHENTICATION_RULE": "rest_framework_simplejwt.authentication.default_user_authentication_rule",
+    "AUTH_TOKEN_CLASSES": ("rest_framework_simplejwt.tokens.AccessToken",),
+    "TOKEN_TYPE_CLAIM": "token_type",
 }
 
 
-AUTH_USER_MODEL = 'user.User'
+AUTH_USER_MODEL = "user.User"
 
 
 # Internationalization

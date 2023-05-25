@@ -35,5 +35,5 @@ ud = "python manage.py seed_users"
 ud2 = "python manage.py seed_users2"
 ad = "python manage.py seed_applies"
 w-alld = """PowerShell.exe -Command "python manage.py seed_priorities; python manage.py seed_majors; python manage.py seed_buildings; python manage.py seed_lockers; python manage.py seed_users; python manage.py seed_applies;" """
-m-alld = "python manage.py seed_priorities; manage.py seed_majors; python manage.py seed_buildings; python manage.py seed_lockers; python manage.py seed_users; python manage.py seed_applies"
+m-alld = "python manage.py seed_priorities && manage.py seed_majors && python manage.py seed_buildings && python manage.py seed_lockers && python manage.py seed_users && python manage.py seed_applies"
 m-del = 'find . -path "./*/migrations/*.py" ! -name "__init__.py" -delete'
