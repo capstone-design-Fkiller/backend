@@ -25,7 +25,7 @@ class AlertView(generics.ListCreateAPIView):
             else: # 쿼리 없을 시, 전체 데이터 요청
                 alerts = Alert.objects.all()
             serializer = AlertSerializer(alerts, many=True)
-            return Response({ "alerts" : serializer.data})
+            return Response({"alerts":serializer.data})
         except ValidationError as err:
                 return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     

@@ -52,7 +52,6 @@ class LoginView(TokenObtainPairView):
             )
             print(access_token)
             if access_token != "null":
-                access_token = json.loads(access_token)
                 payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
                 pk = payload.get("user_id")
                 user = get_object_or_404(User, pk=pk)

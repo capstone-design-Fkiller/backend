@@ -104,7 +104,7 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    "Authorization",  
+    "Authorization",
     "access_token",  # 허용할 헤더 필드 추가
     "refresh_token",
 ]
