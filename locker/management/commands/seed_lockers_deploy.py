@@ -8,23 +8,24 @@ class Command(BaseCommand):
     help = 'Seed Locker data'
 
     def handle(self, *args, **options):
-        majors = info.MAJORS_deploy
+        majors = info.MAJORS_DEPLOY
         buildings = Building.objects.all()
 
         seeder = Seed.seeder()
         for major_name, major_data in majors.items():
-            count = major_data['count']  # 학과별 사물함 개수
+            # count = major_data['count']  # 학과별 사물함 개수
             lockers = major_data['lockers']  # 건물별 사물함 개수 (dictionary)
-            major = Major.objects.get(name=major_name)
+            # major = Major.objects.get(name=major_name)
 
-            for building_num, locker_count in lockers.items():
-                building = buildings.get(id=building_num)
+            for building_floor, locker_count in lockers.items():
+                building_num, floor = building_floor  # 건물 번호와 층 정보를 분리
 
                 seeder.add_entity(
                     Locker,
                     locker_count,
                     {
                         'building_id': Building.objects.filter(id=building_num).first(),
+                        'floor': floor,
                         'major': Major.objects.filter(name=major_name).first(),
                         'owned_id':None,
                         'shared_id':None,
