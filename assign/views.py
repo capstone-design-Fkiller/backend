@@ -3,9 +3,7 @@ from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
-from django.core.management import call_command
-from django.db.models.functions import RowNumber
-from django.db.models import Count, F, Window
+import json
 
 from user.models import User
 from apply.models import Apply
@@ -32,15 +30,19 @@ class AssignAPIView(APIView):
     
     # 학과 사물함을 user에게 assign 
     def post(self, request, major, format=None):
-        data = request.data
         assigned = []
 
+        # JSON 파싱
+        json_data = json.dumps(request.data)
+        with open('data.json', 'w') as fp:
+            fp.write(json_data)
+        data = json.loads(json_data)
+
+        assign_list = data["list"]
         major = Major.objects.get(id=major)
 
-        for rank, apply_id in data.items():
-            rank = int(rank)
-            apply_id = int(apply_id)
-
+        # 배정할 신청정보 리스트를 순회
+        for apply_id in assign_list:
             apply = Apply.objects.get(id=apply_id)
             building_id = apply.building_id
             user = apply.user
@@ -68,8 +70,7 @@ class AssignAPIView(APIView):
                     user.locker = locker
                     user.save()
 
-                    print("debug : 순위:", rank,
-                          "| 신청", apply_id,
+                    print("| 신청", apply_id,
                           "| 이름", apply.user,
                           "| 건물번호", building_id,
                           "| 사물함번호", locker)
@@ -82,7 +83,7 @@ class AssignAPIView(APIView):
                 unanssign_instance = Unassign.objects.create(user=user, apply=apply, major=major)
                 unanssign_instance.save()
 
-                print("debug : 탈락! 순위:", rank, "| 신청", apply_id, "| 이름", apply.user)
+                print("debug : 탈락!", "| 신청", apply_id, "| 이름", apply.user)
 
         serializer = AssignPostSerializer(assigned, many=True)
 

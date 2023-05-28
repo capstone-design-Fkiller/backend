@@ -21,6 +21,7 @@ class Locker(models.Model): # 얘 만들려면 major db가 먼저 있어야 한�
     id = models.BigAutoField(primary_key=True)
     # building_id = models.IntegerField() # 빌딩은 int로 잘 되었고,
     major = models.ForeignKey(Major, related_name="locker", on_delete=models.PROTECT, db_column="major") # 맞는지 모르겠다.
+    floor = models.CharField(max_length=10)
     building_id = models.ForeignKey(Building, related_name='locker', on_delete=models.PROTECT, db_column='building_id')
     owned_id = models.ForeignKey(User, related_name='owned_locker', on_delete=models.PROTECT, db_column="owned_id", null=True, blank=True) # 이건 맞고 
     shared_id = models.ForeignKey(User, related_name='shared_locker', on_delete=models.PROTECT, db_column="shared_id", null=True, blank=True) # 이것도 맞다.
