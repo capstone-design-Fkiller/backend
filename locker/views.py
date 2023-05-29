@@ -54,6 +54,12 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
     # 쉐어 신청을 완료 할 때는 사용자의 승인 없다고 치고, 사물
 
     def put(self, request, pk, format=None):
+        # user = request.data.get('user')
+        
+        # # 이미 신청한 학생인지 확인
+        # if Locker.objects.filter(user=user).exists:
+        #     return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
+
         locker = self.get_object(pk)
         serializer = LockerPostSerializer(locker, data=request.data)
         if serializer.is_valid():
