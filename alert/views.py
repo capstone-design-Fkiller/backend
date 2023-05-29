@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.http import Http404
 
 from alert.models import Alert  
-from alert.serializers import AlertSerializer
+from alert.serializers import AlertPostSerializer, AlertSerializer
 # from rest_framework import viewsets
 from rest_framework import generics
 
@@ -31,7 +31,7 @@ class AlertView(generics.ListCreateAPIView):
     
     # 알림 전송 --- 관리자가 사용자를 지정할 때 receiver = 17
     def post(self, request):
-        serializer = AlertSerializer(data = request.data) # json을 변환하게 된다.
+        serializer = AlertPostSerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
             alert = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
