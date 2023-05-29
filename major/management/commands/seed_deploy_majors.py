@@ -14,6 +14,8 @@ class Command(BaseCommand):
         for major in info.MAJORS :
             seeder.add_entity(Major, 1, {
                 'name': major,
+                'start_date' : None,
+                'end_date' : None,
                 'apply_start_date': None,
                 'apply_end_date': None,
                 'priority_1': None,
