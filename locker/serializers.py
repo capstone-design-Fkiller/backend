@@ -24,19 +24,25 @@ class LockerPostSerializer(serializers.ModelSerializer):
 
     
     def update(self, instance, validated_data):
-        if 'floor' not in validated_data:
-            validated_data['floor'] = instance.floor
-        if 'major' not in validated_data:
-            validated_data['major'] = instance.major
-        if 'building_id' not in validated_data:
-            validated_data['building_id'] = instance.building_id
         share_start_date = validated_data.get('share_start_date')
         share_end_date = validated_data.get('share_end_date')
-        if (share_start_date != None) and (share_end_date != None):
-            validated_data['is_share_registered'] = True
-        elif (share_start_date == None) and (share_end_date == None):
+        is_share_registered = validated_data.get('is_share_registered')
+        shared_id = validated_data.get('shared_id')
+
+        # if (is_share_registered == False):
+        #     validated_data['share_start_date'] = None
+        #     validated_data['share_end_date'] = None
+        #     validated_data['is_share_registered'] = False
+        #     return super().update(instance, validated_data)
+        if (share_start_date == None) and (share_end_date == None) and (shared_id == None):
             validated_data['is_share_registered'] = False
-        return super().update(instance, validated_data)
+            validated_data['shared_id'] = None
+            return super().update(instance, validated_data)
+        elif (share_start_date != None) and (share_end_date != None):
+            validated_data['is_share_registered'] = True
+            return super().update(instance, validated_data)
+        else:
+            return super().update(instance, validated_data)
 
     class Meta:
         model = Locker
