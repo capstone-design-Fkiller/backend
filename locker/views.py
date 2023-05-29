@@ -54,6 +54,7 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
     # 쉐어 신청을 완료 할 때는 사용자의 승인 없다고 치고, 사물
 
     def put(self, request, pk, format=None):
+        print(request.data, "뭐 들어와 출력")
         locker = self.get_object(pk)
         serializer = LockerPostSerializer(locker, data=request.data)
         if serializer.is_valid():

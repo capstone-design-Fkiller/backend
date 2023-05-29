@@ -14,6 +14,8 @@ class Command(BaseCommand):
         for major in info.MAJORS :
             seeder.add_entity(Major, 1, {
                 'name': major,
+                'start_date' : None,
+                'end_date' : None,
                 'apply_start_date': "2023-3-1",
                 'apply_end_date': "2023-6-20",
                 'priority_1': Priority.objects.filter(name="학생회비 납부여부").first(),
