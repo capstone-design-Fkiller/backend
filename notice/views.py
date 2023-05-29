@@ -21,6 +21,10 @@ class NoticeView(generics.ListCreateAPIView):
                 page = request.GET.get('page')
                 paginator = Paginator(notices, 10)
                 page_obj = paginator.page(page)
+            elif request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+                params = request.GET
+                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+                notices = Notice.objects.filter(**params)
             serializer = NoticeSerializer(notices, many=True)
             return Response(serializer.data)
         except ValidationError as err:
