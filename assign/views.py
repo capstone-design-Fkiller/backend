@@ -67,7 +67,7 @@ class AssignAPIView(APIView):
                     locker.owned_id = apply.user
                     locker.save()
                     # 사용자 정보 수정
-                    user.locker = locker
+                    user.locker_id = locker
                     #user.locker = locker
                     user.save()
 
@@ -104,8 +104,8 @@ class AssignAPIView(APIView):
                 locker.save()
         # user의 필드값 수정
         for user in users :
-            if user.locker is not None :
-                user.locker = None
+            if user.locker_id is not None :
+                user.locker_id = None
                 user.save()
 
         assigns = Assign.objects.filter(major=major)
