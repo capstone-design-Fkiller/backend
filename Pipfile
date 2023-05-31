@@ -15,6 +15,7 @@ django-allauth = "*"
 djangorestframework-simplejwt = "*"
 drf-yasg = "*"
 django-cors-headers = "*"
+apscheduler = "*"
 
 [dev-packages]
 
