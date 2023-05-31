@@ -29,4 +29,4 @@ class Command(BaseCommand):
             user = User(id=id, name=name, major=major)
             User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode, is_adminable=is_adminable)
 
-        self.stdout.write(self.style.SUCCESS(USER_COUNT, "Users Seeded!"))
+        self.stdout.write(self.style.SUCCESS(f"{USER_COUNT} Users Seeded!"))
