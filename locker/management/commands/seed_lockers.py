@@ -13,17 +13,26 @@ class Command(BaseCommand):
 
         seeder = Seed.seeder()
         for major_name, major_data in majors.items():
-            # count = major_data['count']  # 학과별 사물함 개수
+            count = major_data['count']  # 학과별 사물함 개수
             lockers = major_data['lockers']  # 건물별 사물함 개수 (dictionary)
             # major = Major.objects.get(name=major_name)
+            locker_numbers = []
 
             for building_floor, locker_count in lockers.items():
                 building_num, floor = building_floor  # 건물 번호와 층 정보를 분리
+                
+                #digits = 4 if locker_count >= 100 else 3 # 사물함 개수의 자릿수를 확인
+                
+                #locker_id_prefix = str(building_num) + str(floor)
+                #print(locker_id_prefix)
+
+                locker_numbers.extend(range(1, locker_count + 1))
 
                 seeder.add_entity(
                     Locker,
                     locker_count,
                     {
+                        # 'locker_number': lambda x : [index for index , _ in enumerate(x)][0],
                         'building_id': Building.objects.filter(id=building_num).first(),
                         'floor': floor,
                         'major': Major.objects.filter(name=major_name).first(),
