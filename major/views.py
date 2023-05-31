@@ -46,6 +46,15 @@ class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
         major = self.get_object(pk)
         serializer = MajorRequestSerializer(major)
         return Response(serializer.data)
+    
+    
+    def patch(self, request, pk, format=None):
+        major = self.get_object(pk)
+        serializer = MajorRequestSerializer(major, data=request.data, partial=True) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Major 수정하기
     def put(self, request, pk, format=None):
