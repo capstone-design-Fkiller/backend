@@ -1,4 +1,6 @@
 from django.forms import ValidationError
+import jwt
+from backend.settings import SECRET_KEY
 from rest_framework import status, generics
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -18,6 +20,7 @@ class LockerAPIView(generics.ListCreateAPIView):
                 params = request.GET
                 params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
                 lockers = Locker.objects.filter(**params)
+                
             else: # 쿼리 없을 시, 전체 데이터 요청
                 lockers = Locker.objects.all()
 
@@ -144,3 +147,41 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
         locker = self.get_object(pk)
         locker.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
+
+class ShareableLockerView(generics.ListCreateAPIView):
+    queryset = lockers = Locker.objects.all()
+    serializer_class = LockerSerializer
+
+    def get(self, request, **kwargs):
+        try:
+            auth_header = request.headers["Authorization"]
+            access_token = (
+                auth_header.split(" ")[1] if len(auth_header.split(" ")) > 1 else None
+            )
+            # print(access_token)
+            # print(type(access_token))
+            if access_token != None and access_token != "null":
+                payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
+                pk = payload.get("user_id")
+            
+            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+                params = request.GET
+                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+                lockers = Locker.objects.filter(**params)
+                lockers = lockers.exclude(owned_id=pk)
+                
+            else: # 쿼리 없을 시, 전체 데이터 요청
+                lockers = Locker.objects.all()
+
+            serializer = LockerSerializer(lockers, many=True)
+            return Response(serializer.data)
+        except ValidationError as err:
+                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(self, request):
+        serializer = LockerRequestSerializer(data = request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
