@@ -68,12 +68,13 @@ class AssignAPIView(APIView):
                     locker.save()
                     # 사용자 정보 수정
                     user.locker = locker
+                    #user.locker = locker
                     user.save()
 
                     print("| 신청", apply_id,
                           "| 이름", apply.user,
                           "| 건물번호", building_id,
-                          "| 사물함번호", locker)
+                          "| 사물함번호", locker.locker_number)
 
                     break
                 
