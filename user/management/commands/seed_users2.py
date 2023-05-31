@@ -16,7 +16,9 @@ class Command(BaseCommand):
         majors = Major.objects.all()
         fake = Faker('ko_KR')
 
-        for i in range(10):
+        USER_COUNT = 50
+
+        for i in range(USER_COUNT):
             id = int(str(random.randint(2016, 2023)) + str(random.randint(10000, 99999)))
             password = 'qwer1234!'
             name = fake.name()
@@ -27,4 +29,4 @@ class Command(BaseCommand):
             user = User(id=id, name=name, major=major)
             User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode, is_adminable=is_adminable)
 
-        self.stdout.write(self.style.SUCCESS("10 Users Seeded!"))
+        self.stdout.write(self.style.SUCCESS(USER_COUNT, "Users Seeded!"))

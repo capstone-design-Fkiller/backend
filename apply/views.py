@@ -27,15 +27,21 @@ class ApplyAPIView(generics.ListCreateAPIView):
             serializer = ApplySerializer(applys, many=True)
             return Response(serializer.data)
         except ValidationError as err:
-                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
+        # user = request.data.get('user')
+        
+        # # 이미 신청한 학생인지 확인
+        # if Apply.objects.filter(user=user).exists:
+        #     return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = ApplyPostSerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class ApplyDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Apply.objects.all()
     serializer_class = ApplySerializer
@@ -79,13 +85,14 @@ class SortAPIView(generics.ListAPIView):
     
     # Sort의 detail 보기
     def get(self, request, major, format=None):
+        # 학과에서 배정기준 정보들을 가져옴
         major = Major.objects.get(id=major)
         is_ascending_1 = major.priority_1.is_ascending if major.priority_1 else None
         is_ascending_2 = major.priority_2.is_ascending if major.priority_2 else None
         is_ascending_3 = major.priority_3.is_ascending if major.priority_3 else None
-
         base_rule =  "created_at" if major.is_baserule_FCFS else '?'
 
+        # 배정 기준에 다라 apply 정보 정렬
         if is_ascending_1 == None :
             sort = Apply.objects.filter(major=major).order_by(
                 base_rule
@@ -95,16 +102,16 @@ class SortAPIView(generics.ListAPIView):
                 ('priority_1_answer' if is_ascending_1 else '-priority_1_answer'),
                 base_rule
             )
-        elif is_ascending_3 == None:
+        elif is_ascending_3 == None :
             sort = Apply.objects.filter(major=major).order_by(
                 ('priority_1_answer' if is_ascending_1 else '-priority_1_answer'),
                 ('priority_2_answer' if is_ascending_2 else '-priority_2_answer'),
                 base_rule
             )
-            sort = sort.annotate(rank=Window(expression=RowNumber(), order_by=(
-                F('priority_1_answer').desc(),
-                F('priority_2_answer').desc(),
-                )))
+            # sort = sort.annotate(rank=Window(expression=RowNumber(), order_by=(
+            #     F('priority_1_answer').desc(),
+            #     F('priority_2_answer').desc(),
+            #     )))
         else :
             sort = Apply.objects.filter(major=major).order_by(
                 ('priority_1_answer' if is_ascending_1 else '-priority_1_answer'),
@@ -115,8 +122,8 @@ class SortAPIView(generics.ListAPIView):
 
         serializer = SortSerializer(sort, many=True).data
 
-        for index, data in enumerate(serializer):
-            data['rank'] = index + 1
+        # for index, data in enumerate(serializer):
+        #     data['rank'] = index + 1
 
         return Response(serializer)
 

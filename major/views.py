@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from django.http import Http404
 
 from major.models import Major
-from major.serializers import MajorSerializer
+from major.serializers import MajorSerializer, MajorRequestSerializer
 
 class MajorAPIView(generics.ListCreateAPIView):
     serializer_class = MajorSerializer
@@ -33,7 +33,7 @@ class MajorAPIView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = MajorSerializer
+    serializer_class = MajorRequestSerializer
     
     def get_object(self, pk):
         try:
@@ -44,13 +44,22 @@ class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
     # Major의 detail 보기
     def get(self, request, pk, format=None):
         major = self.get_object(pk)
-        serializer = MajorSerializer(major)
+        serializer = MajorRequestSerializer(major)
         return Response(serializer.data)
+    
+    
+    def patch(self, request, pk, format=None):
+        major = self.get_object(pk)
+        serializer = MajorRequestSerializer(major, data=request.data, partial=True) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Major 수정하기
     def put(self, request, pk, format=None):
         major = self.get_object(pk)
-        serializer = MajorSerializer(major, data=request.data) 
+        serializer = MajorRequestSerializer(major, data=request.data) 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data) 
