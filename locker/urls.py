@@ -5,4 +5,5 @@ urlpatterns = [
     path('locker/', views.LockerAPIView.as_view()),
     path('locker/<int:pk>', views.LockerDetail.as_view()),
     path('locker/sharable/', views.ShareableLockerView.as_view()),
+    path('locker/building/', views.ApplicableLockerView.as_view()),
 ]
