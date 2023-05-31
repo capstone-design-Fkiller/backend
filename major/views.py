@@ -44,7 +44,7 @@ class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
     # Major의 detail 보기
     def get(self, request, pk, format=None):
         major = self.get_object(pk)
-        serializer = MajorRequestSerializer(major)
+        serializer = MajorSerializer(major)
         return Response(serializer.data)
     
     

@@ -51,6 +51,15 @@ class NoticeDetail(generics.RetrieveUpdateDestroyAPIView):
         notice = self.get_object(pk)
         serializer = NoticeSerializer(notice)
         return Response(serializer.data)
+    
+    # Notice 부분 수정하기
+    def patch(self, request, pk, format=None):
+        notice = self.get_object(pk)
+        serializer = NoticeSerializer(notice, data=request.data, partial=True) 
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # Notice 수정하기
     def put(self, request, pk, format=None):
