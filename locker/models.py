@@ -19,6 +19,7 @@ class Building(models.Model):
 #Create your models here.
 class Locker(models.Model):
     id = models.BigAutoField(primary_key=True)
+    locker_number = models.IntegerField(null=True, blank=True)
     major = models.ForeignKey(Major, related_name="locker", on_delete=models.PROTECT, db_column="major")
     floor = models.CharField(max_length=10)
     building_id = models.ForeignKey(Building, related_name='locker', on_delete=models.PROTECT, db_column='building_id')
