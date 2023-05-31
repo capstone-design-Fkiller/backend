@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework.authentication import TokenAuthentication
-from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth import authenticate
 from django.http import Http404
 import jwt
 from user.models import User
@@ -50,8 +50,7 @@ class LoginView(TokenObtainPairView):
             access_token = (
                 auth_header.split(" ")[1] if len(auth_header.split(" ")) > 1 else None
             )
-            print(access_token)
-            if access_token != "null":
+            if access_token != None and access_token != "null":
                 payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
                 pk = payload.get("user_id")
                 user = get_object_or_404(User, pk=pk)

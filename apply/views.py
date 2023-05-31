@@ -27,15 +27,21 @@ class ApplyAPIView(generics.ListCreateAPIView):
             serializer = ApplySerializer(applys, many=True)
             return Response(serializer.data)
         except ValidationError as err:
-                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
+        # user = request.data.get('user')
+        
+        # # 이미 신청한 학생인지 확인
+        # if Apply.objects.filter(user=user).exists:
+        #     return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
+
         serializer = ApplyPostSerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 class ApplyDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Apply.objects.all()
     serializer_class = ApplySerializer

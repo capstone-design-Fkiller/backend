@@ -30,8 +30,6 @@ class Command(BaseCommand):
                         'owned_id':None,
                         'shared_id':None,
                         'is_share_registered': False,
-                        'start_date':None,
-                        'end_date':None,
                         'share_start_date':None,
                         'share_end_date':None
                     }
