@@ -25,7 +25,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_adminable = models.BooleanField(default=False)
     is_valid = models.BooleanField(default=True) # 없어도 될 거 같은데
     created_at = models.DateTimeField(auto_now_add=True)
-    locker = models.ForeignKey("locker.Locker", related_name="user", on_delete=models.PROTECT, db_column="locker", null=True, blank=True)
+    locker_id = models.ForeignKey("locker.Locker", related_name="user", on_delete=models.PROTECT, db_column="locker", null=True, blank=True)
 
     objects = UserManager()
 

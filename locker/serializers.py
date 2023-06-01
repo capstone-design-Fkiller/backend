@@ -1,6 +1,3 @@
-from major.serializers import MajorSerializer, MajorNameSerializer
-from user.serializers import UserSerializer
-from user.models import User
 from rest_framework import serializers
 from major.models import Major
 from .models import Building, Locker
