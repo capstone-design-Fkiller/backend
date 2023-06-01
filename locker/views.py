@@ -9,6 +9,8 @@ from datetime import datetime
 
 from locker.models import Locker
 from locker.serializers import LockerSerializer, LockerRequestSerializer
+from user.models import User
+from user.serializers import UserSerializer
 
 class LockerAPIView(generics.ListCreateAPIView):
     queryset = lockers = Locker.objects.all()
@@ -75,7 +77,7 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
             locker = self.get_object(pk)
 
             # 배정되지 않은 사물함일 경우, 쉐어 불가 처리
-            if locker.owned_id == None:
+            if locker.owned_id == None and (locker.share_start_date or locker.shared_id or locker.share_end_date):
                 serializer.save(share_start_date = None, share_end_date = None, is_share_registered = False, shared_id = None)
                 return Response({'message': f'{locker.id}사물함은 아직 배정되지 않았습니다. 쉐어 불가'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -86,6 +88,10 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
                 if now < locker.share_end_date:
                     print("아직 쉐어 등록 가능")
                     if locker.shared_id:
+                        user = User.objects.get(pk=locker.shared_id.pk)
+                        userSerializer = UserSerializer(data=user)
+                        if userSerializer.is_valid():
+                            userSerializer.save(locker_id=locker.id)
                         serializer.save(is_share_registered=False)
                     else:
                         serializer.save(is_share_registered=True) # 쉐어중인 사람이 없으면, registered가 True로 된다.
@@ -118,9 +124,10 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
             locker = self.get_object(pk)
 
             # 배정되지 않은 사물함일 경우, 쉐어 불가 처리
-            if locker.owned_id == None:
+            if locker.owned_id == None and (locker.share_start_date or locker.shared_id or locker.share_end_date):
                 serializer.save(share_start_date = None, share_end_date = None, is_share_registered = False, shared_id = None)
-                return Response({'message': f'{locker.id}사물함은 아직 배정되지 않았습니다. 쉐어 불가'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{locker.id}사물함은 아직 배정되지 않았습니다. 쉐어 등록 불가'}, status=status.HTTP_400_BAD_REQUEST)
+
 
             # 날짜 둘 다 존재할 경우,
             if locker.share_start_date and locker.share_end_date:
@@ -149,7 +156,7 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
     
 
-class ShareableLockerView(generics.ListCreateAPIView):
+class ShareableLockerView(generics.ListAPIView):
     queryset = lockers = Locker.objects.all()
     serializer_class = LockerSerializer
 
@@ -178,10 +185,26 @@ class ShareableLockerView(generics.ListCreateAPIView):
             return Response(serializer.data)
         except ValidationError as err:
                 return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
-    
-    def post(self, request):
-        serializer = LockerRequestSerializer(data = request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class ApplicableLockerView(generics.ListAPIView):
+    queryset = lockers = Locker.objects.all()
+    serializer_class = LockerSerializer
+
+    def get(self, request, **kwargs):
+        try:
+            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
+                params = request.GET
+                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
+                lockers = Locker.objects.filter(**params)
+                lockers = lockers.values_list('building_id', flat=True).distinct()
+                return Response(lockers)
+                
+                
+            else: # 쿼리 없을 시, 전체 데이터 요청
+                lockers = Locker.objects.all()
+
+            serializer = LockerSerializer(lockers, many=True)
+            return Response(serializer.data)
+        except ValidationError as err:
+                return Response({'detail': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)

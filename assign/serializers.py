@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 class AssignSerializer(serializers.ModelSerializer):
     user_name = serializers.SerializerMethodField()
+    locker_number = serializers.SerializerMethodField()
 
     class Meta:
         model = Assign
@@ -11,9 +12,13 @@ class AssignSerializer(serializers.ModelSerializer):
 
     def get_user_name(self, obj):
         return obj.user.name
+    
+    def get_locker_number(self, obj):
+        return obj.locker.locker_number
 
 class AssignPostSerializer(serializers.ModelSerializer):
     user_name = serializers.SerializerMethodField()
+    locker_number = serializers.SerializerMethodField()
 
     class Meta:
         model = Assign
@@ -21,6 +26,9 @@ class AssignPostSerializer(serializers.ModelSerializer):
 
     def get_user_name(self, obj):
         return obj.user.name
+    
+    def get_locker_number(self, obj):
+        return obj.locker.locker_number
 
 class UnassignSerializer(serializers.ModelSerializer):
 

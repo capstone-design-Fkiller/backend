@@ -16,6 +16,7 @@ djangorestframework-simplejwt = "*"
 drf-yasg = "*"
 django-cors-headers = "*"
 uwsgi = "*"
+django-apscheduler = "*"
 
 [dev-packages]
 

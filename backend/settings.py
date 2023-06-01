@@ -61,6 +61,7 @@ INSTALLED_APPS = [
     "allauth.socialaccount",
     "dj_rest_auth.registration",
     "django_seed",
+    "django_apscheduler",
 ]
 
 MIDDLEWARE = [
@@ -188,6 +189,8 @@ SIMPLE_JWT = {
 
 AUTH_USER_MODEL = "user.User"
 
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"  # 날짜 및 시간 형식 설정
+APSCHEDULER_RUN_NOW = True  # Django 서버 시작 시 바로 스케줄러 실행 여부
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/

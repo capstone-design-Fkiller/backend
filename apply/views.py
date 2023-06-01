@@ -30,11 +30,11 @@ class ApplyAPIView(generics.ListCreateAPIView):
                 return Response({'message': f'{err}'}, status=status.HTTP_400_BAD_REQUEST)
     
     def post(self, request):
-        # user = request.data.get('user')
+        user = request.data.get('user')
         
-        # # 이미 신청한 학생인지 확인
-        # if Apply.objects.filter(user=user).exists:
-        #     return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
+        # 이미 신청한 학생인지 확인
+        if Apply.objects.filter(user=user).exists:
+            return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ApplyPostSerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():

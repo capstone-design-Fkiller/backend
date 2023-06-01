@@ -107,7 +107,7 @@ class LoginSerializer(TokenObtainPairSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker')
+        fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker_id')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -116,9 +116,10 @@ class UserSerializer(serializers.ModelSerializer):
     # major = MajorSerializer() # {major = {major의 모든 정보}} 로 출력 => 이 셋 중에 결정하면 되겠다.
     class Meta:
         model = User
-        fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker')
+        fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker_id')
+
 
 class UserPostSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker')
+        fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker_id')
