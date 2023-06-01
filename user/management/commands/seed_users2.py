@@ -25,6 +25,8 @@ class Command(BaseCommand):
             #major = majors[random.randint(0, len(majors)-1)]
             major = majors[26-1] # 한교과로 assign 테스트
             is_adminable = False # 관리자 안 되게 허용
+            if i < 10 :
+                is_adminable = True # 관리자 되게 허용
             is_usermode = True
             user = User(id=id, name=name, major=major)
             User.objects.create_user(id=id, password=password, name=name, major=major, is_usermode=is_usermode, is_adminable=is_adminable)
