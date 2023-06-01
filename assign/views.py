@@ -24,7 +24,9 @@ class AssignAPIView(APIView):
     
     # Assign의 학과별 get
     def get(self, request, major, format=None):
-        assign = Assign.objects.filter(major=major)
+        assign = Assign.objects.filter(major=major).order_by(
+            "locker"
+            )
         serializer = AssignSerializer(assign, many=True).data
         return Response(serializer)
     
