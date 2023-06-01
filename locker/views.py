@@ -77,7 +77,7 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
             locker = self.get_object(pk)
 
             # 배정되지 않은 사물함일 경우, 쉐어 불가 처리
-            if locker.owned_id == None:
+            if locker.owned_id == None and (locker.share_start_date or locker.shared_id or locker.share_end_date):
                 serializer.save(share_start_date = None, share_end_date = None, is_share_registered = False, shared_id = None)
                 return Response({'message': f'{locker.id}사물함은 아직 배정되지 않았습니다. 쉐어 불가'}, status=status.HTTP_400_BAD_REQUEST)
 
@@ -88,9 +88,10 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
                 if now < locker.share_end_date:
                     print("아직 쉐어 등록 가능")
                     if locker.shared_id:
-                        user = User.objects.get(id=locker.shared_id)
-                        userSerializer = UserSerializer(user)
-                        userSerializer.save(locker_id=locker.id)
+                        user = User.objects.get(pk=locker.shared_id.pk)
+                        userSerializer = UserSerializer(data=user)
+                        if userSerializer.is_valid():
+                            userSerializer.save(locker_id=locker.id)
                         serializer.save(is_share_registered=False)
                     else:
                         serializer.save(is_share_registered=True) # 쉐어중인 사람이 없으면, registered가 True로 된다.
@@ -123,9 +124,10 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
             locker = self.get_object(pk)
 
             # 배정되지 않은 사물함일 경우, 쉐어 불가 처리
-            if locker.owned_id == None:
+            if locker.owned_id == None and (locker.share_start_date or locker.shared_id or locker.share_end_date):
                 serializer.save(share_start_date = None, share_end_date = None, is_share_registered = False, shared_id = None)
-                return Response({'message': f'{locker.id}사물함은 아직 배정되지 않았습니다. 쉐어 불가'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'message': f'{locker.id}사물함은 아직 배정되지 않았습니다. 쉐어 등록 불가'}, status=status.HTTP_400_BAD_REQUEST)
+
 
             # 날짜 둘 다 존재할 경우,
             if locker.share_start_date and locker.share_end_date:
