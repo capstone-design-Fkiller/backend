@@ -13,9 +13,9 @@ class Command(BaseCommand):
         questions = ['학생회비를 납부하셨습니까?',
                      '재학생입니까?',
                      '통학생입니까?',
-                     '통학시간을 입력해주십시오.(분, 숫자로만 입력)',
-                     '자신의 학번을 입력해주십시오.(두자리 숫자만 입력)',
-                     '수강하는 1전공 수업의 수를 입력해주십시오.(개, 숫자로만 입력)']
+                     '분, 숫자만 입력',
+                     '두자리 숫자만 입력',
+                     '개, 숫자만 입력']
         is_bools = [True, True, True, False, False, False]
         is_ascendings = [False, False, False, False, True, False]
 
