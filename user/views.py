@@ -70,7 +70,6 @@ class LoginView(TokenObtainPairView):
 
             if serializer.is_valid(raise_exception=True):
                 access_token = serializer.validated_data.get("access", None)
-                print("여기니~~2")
                 payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
                 pk = payload.get("user_id")
                 user = get_object_or_404(User, pk=pk)
@@ -108,6 +107,8 @@ class LoginView(TokenObtainPairView):
 
             if not user:
                 raise serializers.ValidationError("존재하지 않는 유저입니다.")
+            if user.is_adminable is False and request.data['is_usermode'] is False :
+                return Response({"message": "관리자로 로그인 할 수 없습니다"}, status=status.HTTP_401_UNAUTHORIZED)
             serializer = self.get_serializer(data=request.data)
             if serializer.is_valid(raise_exception=True):
                 refresh_token = serializer.validated_data.get("refresh_token")
