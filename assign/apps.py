@@ -18,5 +18,5 @@ class AssignAppConfig(AppConfig):
 
     def ready(self):
         scheduler = BackgroundScheduler()
-        scheduler.add_job(task, 'interval', days=1)  # 주기 설정 (예: 30분)
+        scheduler.add_job(task, 'interval', minutes=5)  # 주기 설정 (예: 30분)
         scheduler.start()
