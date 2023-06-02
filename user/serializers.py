@@ -122,6 +122,8 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserPostSerializer(serializers.ModelSerializer):
+    id_card_img = serializers.CharField(required=False, default='', allow_blank=True)
+    
     class Meta:
         model = User
         fields = ('id', 'name', 'major', 'penalty', 'penalty_start_date', 'penalty_end_date', 'id_card_img', 'is_usermode', 'is_adminable', 'is_valid', 'created_at', 'locker_id')

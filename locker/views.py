@@ -39,7 +39,7 @@ class LockerAPIView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
-    serializer_class = LockerSerializer
+    serializer_class = LockerRequestSerializer
 
     def get_object(self, pk):
         try:

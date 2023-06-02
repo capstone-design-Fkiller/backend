@@ -1,6 +1,7 @@
 import json
 from django.forms import ValidationError
 from django.shortcuts import get_object_or_404
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -15,7 +16,7 @@ from user.serializers import UserSerializer
 from backend.settings import SECRET_KEY
 
 from dj_rest_auth.registration.views import RegisterView
-from .serializers import RegistrationSerializer
+from .serializers import RegistrationSerializer, UserPostSerializer
 from .serializers import LoginSerializer
 from rest_framework import serializers
 
@@ -155,7 +156,10 @@ class LogoutView(APIView):
             )
 
 
-class UserAPIView(APIView):
+class UserAPIView(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
     id = openapi.Parameter(
         "id",
         openapi.IN_QUERY,
@@ -204,7 +208,10 @@ class UserAPIView(APIView):
         return Response(request.data, status=status.HTTP_201_CREATED)
 
 
-class UserDetail(APIView):
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserPostSerializer
+
     def get_object(self, pk):
         try:
             return User.objects.get(pk=pk)
@@ -248,7 +255,7 @@ class UserDetail(APIView):
     )
     def patch(self, request, pk, format=None):
         user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data, partial=True)
+        serializer = UserPostSerializer(user, data=request.data, partial=True)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -261,7 +268,7 @@ class UserDetail(APIView):
     )
     def put(self, request, pk, format=None):
         user = self.get_object(pk)
-        serializer = UserSerializer(user, data=request.data)
+        serializer = UserPostSerializer(user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
