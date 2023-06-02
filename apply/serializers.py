@@ -18,7 +18,7 @@ class ApplySerializer(serializers.ModelSerializer):
         model = Apply
         fields = '__all__'
         
-class ApplyPostSerializer(serializers.ModelSerializer):
+class ApplyRequestSerializer(serializers.ModelSerializer):
     # priority_1 = PrioritySerializer() # question answer를 담을 수 있도록
 
     class Meta:

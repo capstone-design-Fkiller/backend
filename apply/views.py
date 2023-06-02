@@ -10,7 +10,7 @@ from django.db.models import Count, F, Window
 
 from apply.models import Apply
 from major.models import Major
-from apply.serializers import ApplySerializer, ApplyPostSerializer, SortSerializer
+from apply.serializers import ApplySerializer, ApplyRequestSerializer, SortSerializer
 
 class ApplyAPIView(generics.ListCreateAPIView):
     queryset = Apply.objects.all()
@@ -33,10 +33,12 @@ class ApplyAPIView(generics.ListCreateAPIView):
         user = request.data.get('user')
         
         # 이미 신청한 학생인지 확인
-        if Apply.objects.filter(user=user).exists:
+        appyUser = Apply.objects.filter(user=user).exists()
+        if appyUser:
+
             return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ApplyPostSerializer(data = request.data) # json을 변환하게 된다.
+        serializer = ApplyRequestSerializer(data = request.data) # json을 변환하게 된다.
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -50,7 +52,7 @@ class ApplyAPIView(generics.ListCreateAPIView):
 
 class ApplyDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Apply.objects.all()
-    serializer_class = ApplySerializer
+    serializer_class = ApplyRequestSerializer
 
     def get_object(self, pk):
         try:
@@ -67,7 +69,7 @@ class ApplyDetail(generics.RetrieveUpdateDestroyAPIView):
     # Apply 수정하기
     def put(self, request, pk, format=None):
         apply = self.get_object(pk)
-        serializer = ApplySerializer(apply, data=request.data) 
+        serializer = ApplyRequestSerializer(apply, data=request.data) 
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data) 

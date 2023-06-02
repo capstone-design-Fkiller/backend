@@ -41,6 +41,7 @@ class MajorAPIView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Major.objects.all()
     serializer_class = MajorRequestSerializer
     
     def get_object(self, pk):
