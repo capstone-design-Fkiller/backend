@@ -13,6 +13,7 @@ class RegistrationSerializer(RegisterSerializer):
     # password2 = serializers.CharField(write_only=True, style={'input_type': 'password', 'autocomplete': 'new-password'})
     name = serializers.CharField(max_length=50, required=True)
     is_usermode = serializers.BooleanField(required=False, default=True)
+    is_adminable = serializers.BooleanField(required=False, default=False)
 
     # username 필드와 email필드를 Serializer에서 제거
     def __init__(self, *args, **kwargs):
@@ -49,12 +50,13 @@ class RegistrationSerializer(RegisterSerializer):
         id = self.validated_data.get('id')
         name = self.validated_data.get('name')
         is_usermode = self.validated_data.get('is_usermode')
-        user = User.objects.create_user(id=id, name=name, password=self.validated_data['password1'], major=major, is_usermode=is_usermode)
+        is_adminable = self.validated_data.get('is_adminable')
+        user = User.objects.create_user(id=id, name=name, password=self.validated_data['password1'], major=major, is_usermode=is_usermode, is_adminable=is_adminable)
         return user
 
     class Meta:
         model = User
-        fields = ('id', 'name', 'password1', 'password2', 'is_usermode', 'major')
+        fields = ('id', 'name', 'password1', 'password2', 'is_usermode', 'major', 'is_adminable')
 
 # 로그인 시리얼라이저
 class LoginSerializer(TokenObtainPairSerializer):
