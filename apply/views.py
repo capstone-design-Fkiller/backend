@@ -33,7 +33,9 @@ class ApplyAPIView(generics.ListCreateAPIView):
         user = request.data.get('user')
         
         # 이미 신청한 학생인지 확인
-        if Apply.objects.filter(user=user).exists:
+        appyUser = Apply.objects.filter(user=user).exists()
+        if appyUser:
+
             return Response({'message': '이미 사물함 신청을 했습니다'}, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = ApplyRequestSerializer(data = request.data) # json을 변환하게 된다.
