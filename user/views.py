@@ -246,6 +246,19 @@ class UserDetail(APIView):
         manual_parameters=[putUserDetail],
         responses={200: "Success"},
     )
+    def patch(self, request, pk, format=None):
+        user = self.get_object(pk)
+        serializer = UserSerializer(user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @swagger_auto_schema(
+        tags=["유저 : 개별 유저 정보를 수정합니다."],
+        manual_parameters=[putUserDetail],
+        responses={200: "Success"},
+    )
     def put(self, request, pk, format=None):
         user = self.get_object(pk)
         serializer = UserSerializer(user, data=request.data)
