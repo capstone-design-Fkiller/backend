@@ -71,10 +71,10 @@ class LockerDetail(generics.RetrieveUpdateDestroyAPIView):
                 serializer = LockerSerializer(lockers)
                 return Response({'message': f'{shared_id}는 이미 사물함을 쉐어하고 있는 사용자입니다'}, status=status.HTTP_400_BAD_REQUEST)
             # 사물함 신청 기간 중에는 쉐어 불가 처리
-            user:User = User.objects.get(pk=shared_id)
-            now = datetime.now()  # 현재 날짜
-            if now < user.major.apply_end_date:
-                return Response({'message': f' 신청 기간에는 쉐어 불가합니다.'}, status=status.HTTP_400_BAD_REQUEST)
+            # user:User = User.objects.get(pk=shared_id)
+            # now = datetime.now()  # 현재 날짜
+            # if now < user.major.apply_end_date:
+            #     return Response({'message': f' 신청 기간에는 쉐어 불가합니다.'}, status=status.HTTP_400_BAD_REQUEST)
             
 
         locker = self.get_object(pk)
