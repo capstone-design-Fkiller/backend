@@ -31,7 +31,10 @@ SECRET_KEY = my_settings.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = [".amazonaws.com", "15.165.146.217", "127.0.0.1", 'localhost']
+ALLOWED_HOSTS = [
+    ".amazonaws.com", "15.165.146.217", "127.0.0.1", 'localhost',
+    ".hufs-locker.site",
+    ]
 
 
 # Application definition
@@ -77,6 +80,7 @@ MIDDLEWARE = [
 
 
 CORS_ORIGIN_WHITELIST = [
+    "https://capstone-design-fkiller.github.io",
     "http://127.0.0.1:3000",
     "https://127.0.0.1:3000",
     "http://127.0.0.1:5173",
