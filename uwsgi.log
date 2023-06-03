@@ -44576,3 +44576,13 @@ unable to load app 0 (mountpoint='') (callable not found or import error)
 *** no app loaded. going in full dynamic mode ***
 spawned uWSGI master process (pid: 16532)
 spawned uWSGI worker 1 (pid: 16533, cores: 1)
+...brutally killing workers...
+worker 1 buried after 3 seconds
+binary reloading uWSGI...
+chdir() to /var/log/uwsgi/backend
+closing all non-uwsgi socket fds > 2 (max_fd = 1024)...
+found fd 3 mapped to socket 0 (/tmp/backend.sock)
+running /home/ubuntu/.local/share/virtualenvs/backend-rgN3jAOl/bin/uwsgi
+[uWSGI] getting INI configuration from /srv/backend/.config/uwsgi/backend.ini
+open("/var/log/uwsgi/backend/2023-05-16.log"): Permission denied [core/logging.c line 288]
+VACUUM: pidfile removed.
