@@ -58,49 +58,53 @@ class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
     
     
     def patch(self, request, pk, format=None):
-        def generate_priority_answer(priority):
-                if priority in ["재학여부", "통학여부", "학생회비 납부여부"]:
-                    return random.choice([True, False])
-                elif priority == "통학시간":
-                    return random.randint(1, 150)
-                elif priority == "고학번":
-                    return random.randint(16, 23)
-                elif priority == "전공수업수":
-                    return random.randint(1, 7)
-                else:
-                    return None
+        # # 배정 기준 설정시, 신청 데이터 자동 생성 처리 -> 플로우 꼬임으로 인한 주석처리.
 
-        lockers = Locker.objects.filter(major=pk)
-        lockers_building = lockers.values_list('building_id', flat=True).distinct()
-        print(lockers_building, '빌딩 데이터')
+        # # 배정 기준에 따른, 신청의 응답 랜덤 생성
+        # def generate_priority_answer(priority):
+        #         if priority in ["재학여부", "통학여부", "학생회비 납부여부"]:
+        #             return random.choice([True, False])
+        #         elif priority == "통학시간":
+        #             return random.randint(1, 150)
+        #         elif priority == "고학번":
+        #             return random.randint(16, 23)
+        #         elif priority == "전공수업수":
+        #             return random.randint(1, 7)
+        #         else:
+        #             return None
+        
+        # # 해당 학과의 빌딩 종류 가져오기.
+        # lockers = Locker.objects.filter(major=pk)
+        # lockers_building = lockers.values_list('building_id', flat=True).distinct()
+        # print(lockers_building, '빌딩 데이터')
 
-        seeder = Seed.seeder()
-        fake = Faker()
+        # seeder = Seed.seeder()
+        # fake = Faker()
 
-        users = User.objects.all()
-
-
+        # 배정 기준 설정하는 학과 가져오기
         major = self.get_object(pk)
+        # # 해당 학과의 모든 유저 가져오기 ?? 이러면 안돼 배정 기준 설정하면, 그 사람이 신청될거야.
+        # users = User.objects.filter(major=major)
 
         serializer = MajorRequestSerializer(major, data=request.data, partial=True) 
         if serializer.is_valid():
             serializer.save()
 
-            major = self.get_object(pk)
-            for user in users :
-                seeder.add_entity(Apply, 1, {
-                    'major': lambda x: Major.objects.filter(id__in=[pk]).order_by('?').first(), # 테스트 용
-                    'user': user,
-                    'building_id': lambda x: Building.objects.filter(id__in=lockers_building).order_by('?').first(),
-                    'priority_1_answer': lambda x: generate_priority_answer(request.data["priority_1"]),
-                    'priority_2_answer': lambda x: generate_priority_answer(request.data["priority_2"]),
-                    'priority_3_answer': lambda x: generate_priority_answer(request.data["priority_3"]),
-                    'created_at': lambda x: fake.date_time_between(start_date='-3d', end_date='now')
-                })
+            # # 신청 데이터 자동 생성 주석 처리
+            # major = self.get_object(pk)
+            # for user in users :
+            #     seeder.add_entity(Apply, 1, {
+            #         'major': lambda x: Major.objects.filter(id__in=[pk]).order_by('?').first(), # 테스트 용
+            #         'user': user,
+            #         'building_id': lambda x: Building.objects.filter(id__in=lockers_building).order_by('?').first(),
+            #         'priority_1_answer': lambda x: generate_priority_answer(request.data["priority_1"]),
+            #         'priority_2_answer': lambda x: generate_priority_answer(request.data["priority_2"]),
+            #         'priority_3_answer': lambda x: generate_priority_answer(request.data["priority_3"]),
+            #         'created_at': lambda x: fake.date_time_between(start_date='-3d', end_date='now')
+            #     })
 
-            seeder.execute()
-            print("Apply data, Success!")
-            # self.stdout.write(self.style.SUCCESS("Apply data, Success!"))
+            # seeder.execute()
+            # print("신청 데이터 생성, Success!")
 
             return Response(serializer.data) 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
