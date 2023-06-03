@@ -77,6 +77,7 @@ MIDDLEWARE = [
 
 
 CORS_ORIGIN_WHITELIST = [
+    "https://capstone-design-fkiller.github.io",
     "http://127.0.0.1:3000",
     "https://127.0.0.1:3000",
     "http://127.0.0.1:5173",
