@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 import json
+from alert.models import Alert
 
 from user.models import User
 from apply.models import Apply
@@ -72,6 +73,9 @@ class AssignAPIView(APIView):
                     user.locker_id = locker
                     #user.locker = locker
                     user.save()
+                    # 배정 알림 처리
+                    Alert.objects.create(message="학과 사물함이 배정 되었습니다", major=user.major, receiver=user, sender=user)
+
 
                     print("| 신청", apply_id,
                           "| 이름", apply.user,
@@ -85,6 +89,9 @@ class AssignAPIView(APIView):
                 # Unassign 필드 값 지정하고 저장 : 탈락
                 unanssign_instance = Unassign.objects.create(user=user, apply=apply, major=major)
                 unanssign_instance.save()
+                # 배정 받지 못한 사용자 알림 처리
+                Alert.objects.create(message="학과 사물함이 배정되지 않았습니다.", major=user.major, receiver=user, sender=user)
+
 
                 print("debug : 탈락!", "| 신청", apply_id, "| 이름", apply.user)
 
