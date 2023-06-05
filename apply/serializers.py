@@ -12,6 +12,7 @@ from rest_framework import serializers
 #         fields = '__all__'
 
 class ApplySerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(read_only=True)
     # priority_1 = PrioritySerializer() # question answer를 담을 수 있도록
 
     class Meta:
@@ -19,6 +20,7 @@ class ApplySerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 class ApplyRequestSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(read_only=True)
     # priority_1 = PrioritySerializer() # question answer를 담을 수 있도록
 
     class Meta:
@@ -27,6 +29,7 @@ class ApplyRequestSerializer(serializers.ModelSerializer):
 
 
 class SortSerializer(serializers.ModelSerializer):
+    created_at = serializers.DateTimeField(read_only=True)
     # rank = serializers.SerializerMethodField()
 
     def get_rank(self, obj):
