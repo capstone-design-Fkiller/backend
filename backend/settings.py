@@ -33,7 +33,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     ".amazonaws.com", "15.165.146.217", "127.0.0.1", 'localhost',
-    ".hufs-locker.site",
+    ".hufs-locker.site", "3.38.125.36",
     ]
 
 
