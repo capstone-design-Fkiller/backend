@@ -101,7 +101,7 @@ class MajorDetail(generics.RetrieveUpdateDestroyAPIView):
                         'priority_1_answer': lambda x: generate_priority_answer(request.data["priority_1"]),
                         'priority_2_answer': lambda x: generate_priority_answer(request.data["priority_2"]),
                         'priority_3_answer': lambda x: generate_priority_answer(request.data["priority_3"]),
-                        'created_at': lambda x: fake.date_time_between(start_date='-3d', end_date='now')
+                        # 'created_at': lambda x: fake.date_time_between(start_date='-3d', end_date='now')
                     })
 
                 seeder.execute()
