@@ -57,6 +57,15 @@ class AlertDetail(generics.RetrieveUpdateDestroyAPIView):
         alert = self.get_object(pk)
         serializer = AlertSerializer(alert)
         return Response(serializer.data)
+    
+    # alert 수정하기
+    def patch(self, request, pk, format=None):
+        alert = self.get_object(pk)
+        serializer = AlertSerializer(alert, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     # alert 수정하기
     def put(self, request, pk, format=None):
