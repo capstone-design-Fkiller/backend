@@ -2,14 +2,12 @@ from django.forms import ValidationError
 import jwt
 from backend.settings import SECRET_KEY
 from rest_framework import status, generics
-from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
 from datetime import datetime
 
 from locker.models import Locker
 from locker.serializers import LockerSerializer, LockerRequestSerializer
-from major.models import Major
 from user.models import User
 from user.serializers import UserSerializer
 
@@ -174,8 +172,6 @@ class ShareableLockerView(generics.ListAPIView):
             access_token = (
                 auth_header.split(" ")[1] if len(auth_header.split(" ")) > 1 else None
             )
-            # print(access_token)
-            # print(type(access_token))
             if access_token != None and access_token != "null":
                 payload = jwt.decode(access_token, SECRET_KEY, algorithms=["HS256"])
                 pk = payload.get("user_id")
@@ -184,6 +180,7 @@ class ShareableLockerView(generics.ListAPIView):
                 params = request.GET
                 params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
                 lockers = Locker.objects.filter(**params)
+                # 자신의 락커는 쉐어 불가이니 제외.
                 lockers = lockers.exclude(owned_id=pk)
                 
             else: # 쿼리 없을 시, 전체 데이터 요청
