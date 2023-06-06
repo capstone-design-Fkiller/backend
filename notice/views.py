@@ -1,12 +1,10 @@
 from django.forms import ValidationError
 from rest_framework import status
-from rest_framework.views import APIView
+from django.db.models import F
 from rest_framework.response import Response
 from django.http import Http404
-
 from notice.models import Notice  
 from notice.serializers import NoticeSerializer
-# from rest_framework import viewsets
 from rest_framework import generics
 from django.core.paginator import Paginator
 
@@ -16,7 +14,7 @@ class NoticeView(generics.ListCreateAPIView):
 
     def get(self, request):
         try:
-            notices = Notice.objects.all()
+            notices = Notice.objects.all().order_by(F('created_at').desc())
             if request.GET.get('page'):
                 page = request.GET.get('page')
                 paginator = Paginator(notices, 10)
@@ -24,7 +22,7 @@ class NoticeView(generics.ListCreateAPIView):
             elif request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
                 params = request.GET
                 params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
-                notices = Notice.objects.filter(**params)
+                notices = Notice.objects.filter(**params).order_by(F('created_at').desc())
             serializer = NoticeSerializer(notices, many=True)
             return Response(serializer.data)
         except ValidationError as err:

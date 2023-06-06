@@ -1,4 +1,5 @@
 from django.forms import ValidationError
+from django.db.models import F
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -19,7 +20,7 @@ class AlertView(generics.ListCreateAPIView):
             if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
                 params = request.GET
                 params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
-                alerts = Alert.objects.filter(**params)
+                alerts = Alert.objects.filter(**params).order_by(F('created_at').desc())
             else: # 쿼리 없을 시, 전체 데이터 요청
                 alerts = Alert.objects.all()
             serializer = AlertSerializer(alerts, many=True)
