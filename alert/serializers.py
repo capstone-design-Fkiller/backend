@@ -24,3 +24,10 @@ class AlertPostSerializer(serializers.ModelSerializer):
         fields = '__all__'
         
 
+class AlertPatchSerializer(serializers.ModelSerializer):
+    message = serializers.CharField(max_length=200, read_only=True)
+    
+    class Meta:
+        model = Alert
+        fields = '__all__'
+        
