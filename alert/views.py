@@ -87,12 +87,7 @@ class AlertConvertIsRead(generics.RetrieveUpdateAPIView):
 
     def get(self, request, receiver):
         try:
-            if request.GET: # 쿼리 존재시, 쿼리로 필터링한 데이터 전송.
-                params = request.GET
-                params = {key: (lambda x: params.get(key))(value) for key, value in params.items()}
-                alerts = Alert.objects.filter(**params)
-            else: # 쿼리 없을 시, 전체 데이터 요청
-                alerts = Alert.objects.all()
+            alerts = Alert.objects.filter(receiver=receiver)
             serializer = AlertSerializer(alerts, many=True)
             return Response(serializer.data)
         except ValidationError as err:
