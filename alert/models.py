@@ -9,6 +9,7 @@ class Alert(models.Model):
     message = models.CharField(max_length=200)
     sender = models.ForeignKey(User, related_name="alert_sender", on_delete=models.PROTECT, db_column="sender")
     receiver = models.ForeignKey(User, related_name="alert_receiver", on_delete=models.PROTECT, db_column="receiver")
+    isRead = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

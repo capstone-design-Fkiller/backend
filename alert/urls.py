@@ -4,4 +4,5 @@ from alert import views
 urlpatterns = [
     path('alert/', views.AlertView.as_view()),
     path('alert/<int:pk>', views.AlertDetail.as_view()),
+    path('alert/isRead/<int:receiver>', views.AlertConvertIsRead.as_view()),
 ]
