@@ -32,7 +32,7 @@ SECRET_KEY = my_settings.SECRET_KEY
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    ".amazonaws.com", "15.165.146.217", "127.0.0.1", 'localhost',
+    ".amazonaws.com", "15.165.146.217",
     ".hufs-locker.site", "3.38.125.36",
     ]
 
@@ -81,31 +81,6 @@ MIDDLEWARE = [
 
 CORS_ORIGIN_WHITELIST = [
     "https://capstone-design-fkiller.github.io",
-    "http://127.0.0.1:3000",
-    "https://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-    "https://127.0.0.1:5173",
-    "http://127.0.0.1:5174",
-    "http://127.0.0.1:5713",
-    "https://127.0.0.1:5713",
-    "https://127.0.0.1:5174",
-    "http://127.0.0.1:5714",
-    "https://127.0.0.1:5714",
-    "http://127.0.0.1:8001",
-    "https://127.0.0.1:8001",
-    "http://localhost:3000",
-    "https://localhost:3000",
-    "http://localhost:5173",
-    "http://localhost:5173",
-    "https://localhost:5173",
-    "http://localhost:5174",
-    "http://localhost:5713",
-    "https://localhost:5713",
-    "https://localhost:5174",
-    "http://localhost:5714",
-    "https://localhost:5714",
-    "http://localhost:8001",
-    "https://localhost:8001",
 ]
 
 CORS_ALLOW_HEADERS = list(default_headers) + [
